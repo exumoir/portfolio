@@ -30,12 +30,32 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 50px;
+    padding: 15px 5%; /* Utilisation de % au lieu de px */
     position: fixed;
     width: 100%;
     z-index: 1000;
-    background: rgba(10, 10, 10, 0.8);
+    background: rgba(10, 10, 10, 0.85);
     backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+#main-logo {
+    height: 40px; /* Un peu plus petit pour mobile par défaut */
+    filter: brightness(0) invert(1);
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--light);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #main-logo {
