@@ -40,7 +40,6 @@ nav {
 
 #main-logo {
     height: 80px; /* Ajuste la taille selon tes besoins */
-    filter: brightness(0) invert(1); /* Cette ligne transforme n'importe quel logo noir en blanc pur */
     transition: transform 0.3s ease;
 }
 
