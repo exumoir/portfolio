@@ -39,9 +39,15 @@ nav {
 }
 
 #main-logo {
-    height: 60px; /* Ajuste selon ton logo */
-    filter: brightness(1.2);
+    height: 50px; /* Ajuste la taille selon tes besoins */
+    filter: brightness(0) invert(1); /* Cette ligne transforme n'importe quel logo noir en blanc pur */
+    transition: transform 0.3s ease;
 }
+
+#main-logo:hover {
+    transform: scale(1.05); /* Petit effet de zoom élégant au survol */
+}
+ 
 
 .nav-links {
     display: flex;
