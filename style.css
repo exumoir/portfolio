@@ -166,3 +166,27 @@ footer {
     text-align: center;
     border-top: 1px solid var(--gray);
 }
+.socials {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.social-icon {
+    color: #ffffff; /* Blanc par défaut */
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+}
+
+.social-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.social-icon:hover {
+    color: var(--gold); /* Change en Or au survol */
+    transform: translateY(-3px); /* Petit saut élégant */
+    filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.5)); /* Lueur dorée */
+}
