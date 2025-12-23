@@ -8,6 +8,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
 </head>
 <body>
+<script>
+    // Bloquer le clic droit sur tout le site
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    }, false);
+
+    // Empêcher le glisser-déposer des images
+    document.addEventListener('dragstart', function(e) {
+        if (e.target.nodeName === 'IMG') {
+            e.preventDefault();
+        }
+    }, false);
+</script>
 
     <nav>
         <div class="logo">
