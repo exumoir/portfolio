@@ -56,4 +56,17 @@ document.querySelectorAll('.grid-item').forEach(item => {
         grid-auto-rows: 500px; /* Hauteur des photos sur mobile */
     }
 }
+/* Empêche la sélection bleue du texte et des images */
+body {
+    -webkit-user-select: none;  /* Safari */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Standard */
+}
+
+/* Désactive spécifiquement l'enregistrement via appui long sur mobile */
+img {
+    pointer-events: none;       /* Rend l'image "intouchable" */
+    -webkit-touch-callout: none; /* Désactive le menu contextuel iOS */
+}
+
 });
