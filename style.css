@@ -190,3 +190,85 @@ footer {
     transform: translateY(-3px); /* Petit saut élégant */
     filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.5)); /* Lueur dorée */
 }
+/* --- STYLE DU BLOG --- */
+.blog-page {
+    background-color: #050505;
+}
+
+.blog-hero {
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('images/hero-blog.jpg');
+    background-size: cover;
+    border-bottom: 1px solid var(--gold);
+}
+
+.blog-container {
+    max-width: 1000px;
+    margin: 60px auto;
+    padding: 0 20px;
+    display: grid;
+    gap: 40px;
+}
+
+.blog-card {
+    display: flex;
+    background: #111;
+    border: 1px solid #222;
+    transition: 0.4s;
+    overflow: hidden;
+}
+
+.blog-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-5px);
+}
+
+.post-image {
+    flex: 1;
+    min-height: 250px;
+    background-size: cover;
+    background-position: center;
+}
+
+.post-content {
+    flex: 1.5;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.category {
+    color: var(--gold);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.post-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.read-more {
+    margin-top: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--gold);
+    width: fit-content;
+}
+
+/* Responsive Blog */
+@media (max-width: 768px) {
+    .blog-card {
+        flex-direction: column;
+    }
+}
