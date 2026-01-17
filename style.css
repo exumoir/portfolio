@@ -52,14 +52,29 @@ footer { padding: 100px 50px; text-align: center; background: #050505; }
 .reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease-out; }
 .reveal.active { opacity: 1; transform: translateY(0); }
 
-/* MOBILE */
 @media (max-width: 768px) {
-    .nav-links { display: none; } /* On pourrait ajouter un menu burger plus tard */
-    .hero h1 { font-size: 2.5rem; }
-    .about-container { flex-direction: column; gap: 40px; }
-    .grid-container { grid-template-columns: 1fr; }
-    .grid-item { height: 350px; }
+    nav { padding: 15px 20px; }
+    #main-logo { height: 35px; }
+    
+    .nav-links {
+        position: fixed;
+        right: -100%;
+        top: 70px;
+        flex-direction: column;
+        background: rgba(10, 10, 10, 0.98);
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 40px 0;
+        border-bottom: 1px solid var(--gold);
+    }
 
+    .nav-links.active { right: 0; }
+    
+    /* On peut ajouter un bouton menu ici ou laisser les liens visibles en petit */
+    .nav-links { display: flex; right: 0; position: relative; top: 0; flex-direction: row; gap: 10px; padding: 0; border: none; }
+    .nav-links a { font-size: 0.6rem; }
+}
     /* LIGHTBOX STYLE */
 .lightbox {
     display: none;
