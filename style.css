@@ -1,424 +1,62 @@
 :root {
-    --dark: #0a0a0a;
-    --gold: #c5a059;
-    --light: #f4f4f4;
-    --gray: #222;
+    --gold: #C4A484;
+    --black: #0a0a0a;
+    --white: #ffffff;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background-color: var(--black); color: var(--white); font-family: 'Montserrat', sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
 
-body {
-    background-color: var(--dark);
-    color: var(--light);
-    font-family: 'Montserrat', sans-serif;
-    line-height: 1.6;
-    overflow-x: hidden;
-}
+/* NAVIGATION */
+nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 50px; position: fixed; width: 100%; top: 0; z-index: 1000; background: rgba(10, 10, 10, 0.95); border-bottom: 1px solid rgba(196, 164, 132, 0.1); }
+#main-logo { height: 45px; transition: transform 0.3s; }
+#main-logo:hover { transform: scale(1.05); }
+.nav-links { display: flex; list-style: none; gap: 30px; }
+.nav-links a { text-decoration: none; color: var(--white); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s; }
+.nav-links a:hover { color: var(--gold); }
 
-h1, h2 {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    letter-spacing: 2px;
-}
+/* HERO */
+.hero { height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('hero-bg.jpg') center/cover; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: 4rem; margin-bottom: 10px; font-weight: 400; }
+.subtitle { font-size: 1rem; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 30px; }
+.btn-gold { padding: 15px 35px; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; text-transform: uppercase; font-size: 0.8rem; transition: all 0.3s; }
+.btn-gold:hover { background: var(--gold); color: var(--black); }
 
-/* Navigation */
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 5%; /* Utilisation de % au lieu de px */
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-    background: rgba(10, 10, 10, 0.85);
-    backdrop-filter: blur(10px);
-    transition: 0.3s;
-}
+/* GALERIE - LES PHOTOS NE SONT PLUS TROP GROSSES */
+.gallery-section { padding: 100px 50px; }
+.section-title { font-family: 'Playfair Display', serif; text-align: center; font-size: 3rem; margin-bottom: 60px; }
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; max-width: 1400px; margin: 0 auto; }
+.grid-item { height: 450px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05); }
+.grid-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(0.2, 1, 0.3, 1); pointer-events: none; }
+.grid-item:hover img { transform: scale(1.1); }
 
- .nav-links {
-    display: flex;
-    list-style: none;
-}
+/* ABOUT SECTION */
+.about-section { padding: 100px 10%; display: flex; justify-content: center; }
+.about-container { display: flex; align-items: center; gap: 80px; max-width: 1100px; }
+.about-image { position: relative; flex: 1; }
+.about-image img { width: 100%; position: relative; z-index: 2; border: 1px solid var(--gold); }
+.image-border { position: absolute; top: 20px; left: -20px; width: 100%; height: 100%; border: 1px solid var(--gold); z-index: 1; }
+.about-text { flex: 1.2; }
+.about-text h2 { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--gold); margin-bottom: 20px; }
+.signature { margin-top: 30px; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--gold); }
 
-.nav-links li {
-    margin-left: 30px;
-}
+/* FOOTER */
+footer { padding: 100px 50px; text-align: center; background: #050505; }
+.contact-info a { display: block; color: var(--white); text-decoration: none; font-size: 1.5rem; margin: 10px 0; font-family: 'Playfair Display', serif; }
+.socials { margin: 30px 0; display: flex; justify-content: center; gap: 20px; }
+.socials a { color: var(--gold); text-decoration: none; font-size: 0.9rem; text-transform: uppercase; }
+.copyright { font-size: 0.7rem; color: #444; margin-top: 50px; letter-spacing: 2px; }
 
-.nav-links a {
-    text-decoration: none;
-    color: var(--light);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    transition: 0.3s;
-}
+/* REVEAL ANIMATION */
+.reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease-out; }
+.reveal.active { opacity: 1; transform: translateY(0); }
 
-.nav-links a:hover {
-    color: var(--gold);
-}
-
-/* Hero Section */
-.hero {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                url('https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1600&q=80');
-    background-size: cover;
-    background-attachment: fixed;
-}
-
-.hero h1 {
-    font-size: 4rem;
-    margin-bottom: 10px;
-}
-
-.btn-gold {
-    display: inline-block;
-    padding: 12px 30px;
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    text-decoration: none;
-    margin-top: 20px;
-    transition: 0.4s;
-}
-
-.btn-gold:hover {
-    background: var(--gold);
-    color: var(--dark);
-}
-/* --- GRILLE DE PHOTOGRAPHIE PRO --- */
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 3 ou 4 colonnes selon l'écran */
-    gap: 20px;
-    padding: 40px;
-    background-color: #000;
-}
-
-.grid-item {
-    height: 450px; /* On impose une hauteur fixe pour l'élégance */
-    overflow: hidden;
-    position: relative;
-    background-color: #111;
-}
-
-.grid-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Recadre proprement sans déformer */
-    transition: transform 0.8s ease;
-}
-
-.grid-item:hover img {
-    transform: scale(1.08); /* Effet zoom luxe au survol */
-}
-
-/* --- RESPONSIVE MOBILE --- */
+/* MOBILE */
 @media (max-width: 768px) {
-    .grid-container {
-        grid-template-columns: 1fr; /* 1 seule colonne sur mobile */
-        padding: 15px;
-        gap: 15px;
-    }
-
-    .grid-item {
-        height: 350px; /* Moins haut sur mobile pour ne pas trop scroller */
-    }
-
-    .about-container {
-        flex-direction: column;
-        padding: 40px 20px;
-    }
-
-    .about-image img {
-        max-width: 100%;
-    }
-}
-
-/* On désactive les effets "Tall" et "Wide" sur petit écran pour éviter les bugs */
-@media (min-width: 769px) {
-    .tall { grid-row: span 2; }
-    .wide { grid-column: span 2; }
-}
-
-/* About & Footer */
-.about-section {
-    background: #111;
-    padding: 100px 20%;
-    text-align: center;
-}
-
-footer {
-    padding: 50px;
-    text-align: center;
-    border-top: 1px solid var(--gray);
-}
-.socials {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-    margin-top: 20px;
-}
-
-.social-icon {
-    color: #ffffff; /* Blanc par défaut */
-    transition: all 0.4s ease;
-    display: flex;
-    align-items: center;
-}
-
-.social-icon svg {
-    width: 28px;
-    height: 28px;
-}
-
-.social-icon:hover {
-    color: var(--gold); /* Change en Or au survol */
-    transform: translateY(-3px); /* Petit saut élégant */
-    filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.5)); /* Lueur dorée */
-}
-/* --- STYLE DU BLOG --- */
-.blog-page {
-    background-color: #050505;
-}
-
-.blog-hero {
-    height: 40vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('images/hero-blog.jpg');
-    background-size: cover;
-    border-bottom: 1px solid var(--gold);
-}
-
-.blog-container {
-    max-width: 1000px;
-    margin: 60px auto;
-    padding: 0 20px;
-    display: grid;
-    gap: 40px;
-}
-
-.blog-card {
-    display: flex;
-    background: #111;
-    border: 1px solid #222;
-    transition: 0.4s;
-    overflow: hidden;
-}
-
-.blog-card:hover {
-    border-color: var(--gold);
-    transform: translateY(-5px);
-}
-
-.post-image {
-    flex: 1;
-    min-height: 250px;
-    background-size: cover;
-    background-position: center;
-}
-
-.post-content {
-    flex: 1.5;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.category {
-    color: var(--gold);
-    text-transform: uppercase;
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-}
-
-.post-content h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-}
-
-.read-more {
-    margin-top: 20px;
-    color: #fff;
-    text-decoration: none;
-    font-size: 0.9rem;
-    border-bottom: 1px solid var(--gold);
-    width: fit-content;
-}
-
-/* Responsive Blog */
-@media (max-width: 768px) {
-    .blog-card {
-        flex-direction: column;
-    }
-/* --- CARROUSEL DESIGN --- */
-.carousel-container {
-    position: relative;
-    width: 100%;
-    height: 80vh; /* Hauteur immersive */
-    overflow: hidden;
-    background-color: #000;
-}
-
-.carousel-track {
-    display: flex;
-    height: 100%;
-    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.carousel-slide {
-    min-width: 100%;
-    position: relative;
-}
-
-.carousel-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Important pour ne pas déformer vos photos */
-    filter: brightness(0.8);
-    transition: filter 0.5s ease;
-}
-
-.carousel-slide:hover img {
-    filter: brightness(1);
-}
-
-/* Légende sur l'image */
-.slide-caption {
-    position: absolute;
-    bottom: 50px;
-    left: 50px;
-    color: #fff;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border-left: 3px solid #C4A484; /* Touche d'or */
-    padding-left: 20px;
-}
-
-/* Boutons de navigation */
-.carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.3);
-    color: #C4A484;
-    border: 1px solid #C4A484;
-    font-size: 2rem;
-    padding: 15px 20px;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
-}
-
-.carousel-btn:hover {
-    background: #C4A484;
-    color: #000;
-}
-
-.prev { left: 20px; }
-.next { right: 20px; }
-
-/* Points indicateurs */
-.carousel-nav {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 15px;
-}
-
-.carousel-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-}
-
-.carousel-indicator.active {
-    background: #C4A484;
-    box-shadow: 0 0 10px #C4A484;
-}    
-}/* --- NAVIGATION & LOGO STYLING --- */
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 50px;
-    background-color: #000; /* Fond noir pour le côté glamour */
-    position: fixed; /* Reste en haut au scroll */
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-}
-
-.logo-container {
-    flex: 0 0 auto;
-}
-
-#main-logo {
-    height: 100px; /* Taille idéale pour un logo pro */
-    background-color: #000;
-    width: auto;  /* Garde les proportions */
-    display: block;
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-/* Effet au survol du logo */
-#main-logo:hover {
-    transform: scale(1.05); /* Zoom très léger */
-    filter: brightness(1.2); /* Brillance subtile */
-}
-
-/* Ajustement pour les liens pour qu'ils soient alignés avec le logo */
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: #fff;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 200;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: #C4A484; /* Rappel de l'or au survol */
-}
-
-/* Correction pour le Hero qui est sous le menu fixe */
-.hero {
-    margin-top: 80px; 
-}
-.reveal {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: all 1s ease-out;
-}
-
-.reveal.active {
-    opacity: 1;
-    transform: translateY(0);
+    .nav-links { display: none; } /* On pourrait ajouter un menu burger plus tard */
+    .hero h1 { font-size: 2.5rem; }
+    .about-container { flex-direction: column; gap: 40px; }
+    .grid-container { grid-template-columns: 1fr; }
+    .grid-item { height: 350px; }
 }
