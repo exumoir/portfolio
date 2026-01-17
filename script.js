@@ -68,5 +68,42 @@ img {
     pointer-events: none;       /* Rend l'image "intouchable" */
     -webkit-touch-callout: none; /* Désactive le menu contextuel iOS */
 }
+const track = document.querySelector('.carousel-track');
+const slides = Array.from(track.children);
+const nextButton = document.querySelector('.carousel-btn.next');
+const prevButton = document.querySelector('.carousel-btn.prev');
+const dotsNav = document.querySelector('.carousel-nav');
+const dots = Array.from(dotsNav.children);
 
+let currentIndex = 0;
+
+const updateCarousel = (index) => {
+    track.style.transform = `translateX(-${index * 100}%)`;
+    // Update dots
+    dots.forEach(dot => dot.classList.remove('active'));
+    dots[index].classList.add('active');
+};
+
+nextButton.addEventListener('click', () => {
+    currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;
+    updateCarousel(currentIndex);
+});
+
+prevButton.addEventListener('click', () => {
+    currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
+    updateCarousel(currentIndex);
+});
+
+// Navigation par les points
+dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+        currentIndex = index;
+        updateCarousel(currentIndex);
+    });
+});
+
+// Optionnel : Défilement automatique toutes les 5 secondes
+setInterval(() => {
+    nextButton.click();
+}, 5000);
 });
