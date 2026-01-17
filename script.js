@@ -1,20 +1,64 @@
-// Animation au défilement
-window.addEventListener('scroll', () => {
-    const fadeElements = document.querySelectorAll('.grid-item');
-    fadeElements.forEach(el => {
-        const speed = 0.5;
-        const rect = el.getBoundingClientRect();
-        if(rect.top < window.innerHeight) {
+// 1. Protection Images
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('dragstart', e => {
+    if (e.target.nodeName === 'IMG') e.preventDefault();
+});
+
+// 2. Animation au Défilement (Scroll Reveal)
+const revealElements = () => {
+    const reveals = document.querySelectorAll('.grid-item, .about-section');
+    reveals.forEach(el => {
+        const windowHeight = window.innerHeight;
+        const elementTop = el.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < windowHeight - elementVisible) {
             el.style.opacity = "1";
             el.style.transform = "translateY(0)";
         }
     });
+};
 
-// Initialisation des styles pour l'animation
-document.querySelectorAll('.grid-item').forEach(item => {
+// Initialisation des styles avant l'animation
+document.querySelectorAll('.grid-item, .about-section').forEach(item => {
     item.style.opacity = "0";
-    item.style.transform = "translateY(30px)";
+    item.style.transform = "translateY(40px)";
     item.style.transition = "all 0.8s ease-out";
+});
+
+window.addEventListener('scroll', revealElements);
+
+// 3. Gestion du Carrousel
+const track = document.querySelector('.carousel-track');
+if (track) {
+    const slides = Array.from(track.children);
+    const nextButton = document.querySelector('.carousel-btn.next');
+    const prevButton = document.querySelector('.carousel-btn.prev');
+    const dots = Array.from(document.querySelectorAll('.carousel-indicator'));
+
+    let currentIndex = 0;
+
+    const updateCarousel = (index) => {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        dots.forEach(dot => dot.classList.remove('active'));
+        if(dots[index]) dots[index].classList.add('active');
+    };
+
+    nextButton?.addEventListener('click', () => {
+        currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;
+        updateCarousel(currentIndex);
+    });
+
+    prevButton?.addEventListener('click', () => {
+        currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
+        updateCarousel(currentIndex);
+    });
+
+    // Auto-play
+    setInterval(() => {
+        nextButton?.click();
+    }, 5000);
+}
 
     /* --- RESPONSIVE DESIGN (TÉLÉPHONES) --- */
 @media (max-width: 768px) {
