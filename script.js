@@ -9,7 +9,6 @@ window.addEventListener('scroll', () => {
             el.style.transform = "translateY(0)";
         }
     });
-});
 
 // Initialisation des styles pour l'animation
 document.querySelectorAll('.grid-item').forEach(item => {
@@ -92,21 +91,19 @@ nextButton.addEventListener('click', () => {
 prevButton.addEventListener('click', () => {
     currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
     updateCarousel(currentIndex);
-});
+
 
 // Navigation par les points
 dots.forEach((dot, index) => {
     dot.addEventListener('click', () => {
         currentIndex = index;
         updateCarousel(currentIndex);
-    });
-});
 
 // Optionnel : Défilement automatique toutes les 5 secondes
 setInterval(() => {
     nextButton.click();
 }, 5000);
-});
+        
 window.addEventListener('scroll', function() {
     const reveals = document.querySelectorAll('.reveal, .grid-item');
     for (let i = 0; i < reveals.length; i++) {
