@@ -25,3 +25,23 @@ window.addEventListener('scroll', () => {
     heroContent.style.transform = `translateY(${scrollValue * 0.4}px)`;
     heroContent.style.opacity = 1 - (scrollValue / 700);
 });
+// Gestion du Lightbox
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+const closeBtn = document.querySelector('.close-lightbox');
+
+document.querySelectorAll('.grid-item img').forEach(image => {
+    image.style.pointerEvents = "auto"; // On réactive le clic
+    image.addEventListener('click', () => {
+        lightbox.style.display = 'flex';
+        lightboxImg.src = image.src;
+    });
+});
+
+closeBtn.addEventListener('click', () => {
+    lightbox.style.display = 'none';
+});
+
+lightbox.addEventListener('click', (e) => {
+    if(e.target !== lightboxImg) lightbox.style.display = 'none';
+});
