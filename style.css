@@ -351,7 +351,7 @@ nav {
 }
 
 #main-logo {
-    height: 70px; /* Taille idéale pour un logo pro */
+    height: 100px; /* Taille idéale pour un logo pro */
     background-color: #000;
     width: auto;  /* Garde les proportions */
     display: block;
