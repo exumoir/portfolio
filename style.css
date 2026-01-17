@@ -105,30 +105,101 @@ footer { padding: 100px 50px; text-align: center; background: #050505; }
 /* REVEAL ANIMATION */
 .reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease-out; }
 .reveal.active { opacity: 1; transform: translateY(0); }
-
+/* --- FULL RESPONSIVE DESIGN --- */
 @media (max-width: 768px) {
-    nav { padding: 15px 20px; }
-    #main-logo { height: 35px; }
     
-    .nav-links {
-        position: fixed;
-        right: -100%;
-        top: 70px;
-        flex-direction: column;
-        background: rgba(10, 10, 10, 0.98);
-        width: 100%;
-        text-align: center;
-        transition: 0.3s;
-        padding: 40px 0;
-        border-bottom: 1px solid var(--gold);
+    /* 1. Navigation Mobile (Épurée) */
+    nav {
+        padding: 15px 20px;
+        flex-direction: column; /* Aligne logo et menu verticalement */
+        gap: 10px;
     }
 
-    .nav-links.active { right: 0; }
-    
-    /* On peut ajouter un bouton menu ici ou laisser les liens visibles en petit */
-    .nav-links { display: flex; right: 0; position: relative; top: 0; flex-direction: row; gap: 10px; padding: 0; border: none; }
-    .nav-links a { font-size: 0.6rem; }
+    #main-logo {
+        height: 35px;
+    }
+
+    .nav-links {
+        gap: 15px;
+    }
+
+    .nav-links a {
+        font-size: 0.65rem; /* Plus petit pour tenir sur une ligne */
+        letter-spacing: 1px;
+    }
+
+    /* 2. Hero (Impact visuel sans déformer) */
+    .hero {
+        height: 80vh; /* Un peu moins haut pour voir la suite */
+    }
+
+    .hero h1 {
+        font-size: 2.2rem;
+        padding: 0 15px;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+        letter-spacing: 3px;
+    }
+
+    /* 3. Galerie (Le plus important) */
+    .gallery-section {
+        padding: 60px 15px; /* Moins de marge sur les côtés */
+    }
+
+    .section-title {
+        font-size: 2.2rem;
+        margin-bottom: 40px;
+    }
+
+    .grid-container {
+        grid-template-columns: 1fr; /* Une seule photo par ligne pour le luxe */
+        gap: 20px;
+    }
+
+    .grid-item {
+        height: 400px; /* Hauteur fixe pour garder l'aspect pro */
+    }
+
+    /* 4. Section À Propos (Mise en page Magazine Mobile) */
+    .about-section {
+        padding: 60px 20px;
+    }
+
+    .about-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .about-image {
+        width: 100%;
+        max-width: 300px; /* On réduit la photo de toi sur mobile */
+    }
+
+    .image-border {
+        left: -10px; /* On réduit le décalage du cadre or */
+        top: 10px;
+    }
+
+    .about-text {
+        text-align: center;
+    }
+
+    .about-text h2 {
+        font-size: 2rem;
+    }
+
+    /* 5. Footer */
+    footer {
+        padding: 60px 20px;
+    }
+
+    .contact-info a {
+        font-size: 1.1rem;
+    }
 }
+
     /* LIGHTBOX STYLE */
 .lightbox {
     display: none;
