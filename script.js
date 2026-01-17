@@ -1,4 +1,3 @@
-
 // 1. GESTION DU PRELOADER (SORTIE DE L'ÉCRAN NOIR)
 function hidePreloader() {
     const loader = document.getElementById('preloader');
@@ -7,14 +6,12 @@ function hidePreloader() {
         setTimeout(() => {
             loader.style.display = 'none';
             document.body.classList.remove('loading');
-        }, 1000); // Temps pour la transition de disparition
+        }, 1000); 
     }
 }
 
-// Sécurité : Si le site met trop de temps, on force l'affichage après 3s
+// Sécurité : Si le site met trop de temps (ex: connexion lente), on force l'affichage après 3s
 setTimeout(hidePreloader, 3000);
-
-// Quand tout est chargé (images, etc.), on enlève le loader
 window.addEventListener('load', hidePreloader);
 
 // 2. ANIMATION AU SCROLL (REVEAL)
@@ -31,6 +28,31 @@ const reveal = () => {
 };
 
 window.addEventListener('scroll', reveal);
+window.addEventListener('load', reveal); // Lance l'anim au chargement pour les éléments déjà visibles
 
-// 3. PROTECTION IMAGES
+// 3. GESTION DU LIGHTBOX (CLIC SUR IMAGE)
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightbox-img');
+
+document.querySelectorAll('.grid-item img').forEach(img => {
+    // On réactive les clics qui étaient bloqués par pointer-events:none
+    img.style.pointerEvents = 'auto'; 
+    img.style.cursor = 'zoom-in';
+
+    img.addEventListener('click', () => {
+        if (lightbox && lightboxImg) {
+            lightbox.style.display = 'flex';
+            lightboxImg.src = img.src;
+        }
+    });
+});
+
+// Fermer le lightbox en cliquant n'importe où
+if (lightbox) {
+    lightbox.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+    });
+}
+
+// 4. PROTECTION IMAGES (CLIC DROIT)
 document.addEventListener('contextmenu', e => e.preventDefault());
