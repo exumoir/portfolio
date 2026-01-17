@@ -147,7 +147,14 @@ footer { padding: 100px 50px; text-align: center; background: #050505; }
 .socials-minimal a:hover { color: var(--gold); }
 .sep { margin: 0 15px; color: #333; }
 .copyright { font-size: 0.7rem; color: #444; margin-top: 50px; letter-spacing: 2px; }
-
+.contact-grid {
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Pour que les cartes aient la même hauteur */
+    gap: 30px;
+    max-width: 1000px;
+    margin: 60px auto;
+}
 /* --- LIGHTBOX --- */
 .lightbox {
     display: none; position: fixed; z-index: 2000; top: 0; left: 0;
