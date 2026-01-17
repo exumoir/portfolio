@@ -1,22 +1,23 @@
-// 1. Protection contre le vol d'images
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('dragstart', e => {
-    if (e.target.nodeName === 'IMG') e.preventDefault();
-});
 
-// 2. Animation d'entrée (Preloader)
-window.addEventListener('load', () => {
+// 1. GESTION DU PRELOADER (SORTIE DE L'ÉCRAN NOIR)
+function hidePreloader() {
     const loader = document.getElementById('preloader');
     if (loader) {
+        loader.style.opacity = '0';
         setTimeout(() => {
-            loader.style.opacity = '0';
-            loader.style.visibility = 'hidden';
+            loader.style.display = 'none';
             document.body.classList.remove('loading');
-        }, 2000);
+        }, 1000); // Temps pour la transition de disparition
     }
-});
+}
 
-// 3. Animation au défilement (Reveal)
+// Sécurité : Si le site met trop de temps, on force l'affichage après 3s
+setTimeout(hidePreloader, 3000);
+
+// Quand tout est chargé (images, etc.), on enlève le loader
+window.addEventListener('load', hidePreloader);
+
+// 2. ANIMATION AU SCROLL (REVEAL)
 const reveal = () => {
     const reveals = document.querySelectorAll('.reveal, .grid-item');
     reveals.forEach(el => {
@@ -31,22 +32,5 @@ const reveal = () => {
 
 window.addEventListener('scroll', reveal);
 
-// 4. Gestion du Lightbox (Cliquer pour agrandir)
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightbox-img');
-
-document.querySelectorAll('.grid-item img').forEach(img => {
-    img.style.cursor = 'zoom-in';
-    img.addEventListener('click', () => {
-        if (lightbox && lightboxImg) {
-            lightbox.style.display = 'flex';
-            lightboxImg.src = img.src;
-        }
-    });
-});
-
-if (lightbox) {
-    lightbox.addEventListener('click', () => {
-        lightbox.style.display = 'none';
-    });
-}
+// 3. PROTECTION IMAGES
+document.addEventListener('contextmenu', e => e.preventDefault());
