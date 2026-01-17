@@ -3,51 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog | Verco Photo - Coulisses & Technique</title>
+    <title>L'Atelier | Verco Photo - Coulisses & Réflexions</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
 </head>
 <body class="blog-page">
 
     <nav>
-        <div class="logo">Verco Photo</div>
+        <div class="logo-container">
+            <a href="index.html"><img src="logo2.png" alt="Verco Photo Logo" id="main-logo"></a>
+        </div>
         <ul class="nav-links">
-            <li><a href="index.html">Portfolio</a></li>
-            <li><a href="blog.html" class="active">Blog</a></li>
+            <li><a href="index.html#gallery">Galerie</a></li>
+            <li><a href="index.html#about">À Propos</a></li>
             <li><a href="index.html#contact">Contact</a></li>
+            <li><a href="blog.html" class="active">L'Atelier</a></li>
         </ul>
     </nav>
 
     <header class="blog-hero">
-        <h1>L'Atelier de l'Ombre</h1>
-        <p>Technique photo, workflow Linux et explorations dans le Vercors.</p>
+        <h1 class="reveal">L'Atelier</h1>
+        <p class="subtitle reveal">Notes sur la lumière et l'invisible</p>
     </header>
 
     <main class="blog-container">
-        <article class="blog-card">
-            <div class="post-image" style="background-image: url('images/astro-post.jpg');"></div>
+        <article class="blog-post reveal">
+            <div class="post-image">
+                <img src="lumiere.jpg" alt="Travail sur la lumière">
+            </div>
             <div class="post-content">
-                <span class="category">Technique</span>
-                <h2>Astrophotographie sous Linux : Le guide complet avec Siril</h2>
-                <p>Comment j'utilise des logiciels Open Source pour révéler la magie du ciel profond...</p>
-                <a href="articles/siril-guide.html" class="read-more">Lire la suite →</a>
+                <span class="post-date">15 Janvier 2026</span>
+                <h2>Sculpter l'ombre : Ma vision du clair-obscur</h2>
+                <p>La photographie n'est pas l'enregistrement de la lumière, mais la maîtrise de l'ombre. Dans cet article, j'explique comment j'utilise les contrastes pour créer du mystère...</p>
+                <a href="#" class="read-more">Lire la suite</a>
             </div>
         </article>
 
-        <article class="blog-card">
-            <div class="post-image" style="background-image: url('images/1000037587.jpg');"></div>
+        <article class="blog-post reveal">
+            <div class="post-image">
+                <img src="cascade.jpg" alt="Photographie de nature">
+            </div>
             <div class="post-content">
-                <span class="category">Exploration</span>
-                <h2>Gullfoss : Capturer la glace et le feu</h2>
-                <p>Retour sur ma dernière expédition où la lumière dorée a transformé le paysage...</p>
-                <a href="articles/gullfoss.html" class="read-more">Lire la suite →</a>
+                <span class="post-date">02 Janvier 2026</span>
+                <h2>L'état sauvage : Fusion entre mode et nature</h2>
+                <p>Pourquoi j'aime emmener mes modèles au cœur des éléments. Retour sur mon dernier shooting en bord de falaise.</p>
+                <a href="#" class="read-more">Lire la suite</a>
             </div>
         </article>
     </main>
 
     <footer>
-        <p>© 2025 Verco Photo - Créé sous Linux</p>
+        <p class="copyright">VERCO PHOTO © 2026 | L'Atelier</p>
     </footer>
 
+    <script src="script.js"></script>
 </body>
 </html>
