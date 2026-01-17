@@ -105,96 +105,80 @@ footer { padding: 100px 50px; text-align: center; background: #050505; }
 /* REVEAL ANIMATION */
 .reveal { opacity: 0; transform: translateY(30px); transition: all 1s ease-out; }
 .reveal.active { opacity: 1; transform: translateY(0); }
-/* --- FULL RESPONSIVE DESIGN --- */
+
+/* --- CONFIGURATION MOBILE PERFECTIONNÉE --- */
 @media (max-width: 768px) {
     
-    /* 1. Navigation Mobile (Épurée) */
+    /* On réduit les marges globales pour gagner de la place */
     nav {
-        padding: 15px 20px;
-        flex-direction: column; /* Aligne logo et menu verticalement */
-        gap: 10px;
-    }
-
-    #main-logo {
-        height: 35px;
+        padding: 15px;
+        justify-content: center; /* Centre le logo sur mobile */
     }
 
     .nav-links {
-        gap: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
     }
 
     .nav-links a {
-        font-size: 0.65rem; /* Plus petit pour tenir sur une ligne */
-        letter-spacing: 1px;
+        font-size: 0.6rem;
     }
 
-    /* 2. Hero (Impact visuel sans déformer) */
+    /* Hero section : on réduit la taille pour mobile */
     .hero {
-        height: 80vh; /* Un peu moins haut pour voir la suite */
+        height: 70vh;
     }
 
     .hero h1 {
-        font-size: 2.2rem;
-        padding: 0 15px;
+        font-size: 2rem;
+        line-height: 1.2;
     }
 
-    .subtitle {
-        font-size: 0.8rem;
-        letter-spacing: 3px;
-    }
-
-    /* 3. Galerie (Le plus important) */
+    /* GALERIE : C'est ici que ça change tout */
     .gallery-section {
-        padding: 60px 15px; /* Moins de marge sur les côtés */
+        padding: 40px 10px; /* Moins de vide sur les côtés */
     }
 
     .section-title {
-        font-size: 2.2rem;
-        margin-bottom: 40px;
+        font-size: 1.8rem;
+        margin-bottom: 30px;
     }
 
     .grid-container {
-        grid-template-columns: 1fr; /* Une seule photo par ligne pour le luxe */
-        gap: 20px;
+        grid-template-columns: 1fr; /* Une seule photo par ligne pour l'impact */
+        gap: 15px; /* Espace minimaliste et propre */
+        padding: 0;
     }
 
     .grid-item {
-        height: 400px; /* Hauteur fixe pour garder l'aspect pro */
+        height: 60vh; /* La photo prend 60% de la hauteur de l'écran */
+        width: 100%;
+        border-radius: 0; /* Garde les bords droits pour le côté pro */
     }
 
-    /* 4. Section À Propos (Mise en page Magazine Mobile) */
+    /* Section À Propos */
     .about-section {
-        padding: 60px 20px;
+        padding: 50px 20px;
     }
 
     .about-container {
         flex-direction: column;
-        gap: 30px;
-    }
-
-    .about-image {
-        width: 100%;
-        max-width: 300px; /* On réduit la photo de toi sur mobile */
-    }
-
-    .image-border {
-        left: -10px; /* On réduit le décalage du cadre or */
-        top: 10px;
-    }
-
-    .about-text {
         text-align: center;
     }
 
+    .about-image {
+        max-width: 250px;
+        margin: 0 auto;
+    }
+
     .about-text h2 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
-    /* 5. Footer */
-    footer {
-        padding: 60px 20px;
-    }
-
+    /* Footer / Contact */
     .contact-info a {
         font-size: 1.1rem;
     }
