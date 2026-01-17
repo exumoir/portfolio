@@ -362,4 +362,59 @@ footer {
     background: #C4A484;
     box-shadow: 0 0 10px #C4A484;
 }    
+}/* --- NAVIGATION & LOGO STYLING --- */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background-color: #000; /* Fond noir pour le côté glamour */
+    position: fixed; /* Reste en haut au scroll */
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-container {
+    flex: 0 0 auto;
+}
+
+#main-logo {
+    height: 50px; /* Taille idéale pour un logo pro */
+    width: auto;  /* Garde les proportions */
+    display: block;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* Effet au survol du logo */
+#main-logo:hover {
+    transform: scale(1.05); /* Zoom très léger */
+    filter: brightness(1.2); /* Brillance subtile */
+}
+
+/* Ajustement pour les liens pour qu'ils soient alignés avec le logo */
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #C4A484; /* Rappel de l'or au survol */
+}
+
+/* Correction pour le Hero qui est sous le menu fixe */
+.hero {
+    margin-top: 80px; 
 }
