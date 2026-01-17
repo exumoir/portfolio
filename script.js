@@ -45,3 +45,17 @@ closeBtn.addEventListener('click', () => {
 lightbox.addEventListener('click', (e) => {
     if(e.target !== lightboxImg) lightbox.style.display = 'none';
 });
+// Gestion de l'animation d'entrée
+window.addEventListener('load', () => {
+    const loader = document.getElementById('preloader');
+    
+    // On laisse l'animation se jouer au moins 2 secondes
+    setTimeout(() => {
+        loader.style.opacity = '0';
+        loader.style.visibility = 'hidden';
+        document.body.classList.remove('loading');
+    }, 2500);
+});
+
+// Ajouter la classe loading au début
+document.body.classList.add('loading');
