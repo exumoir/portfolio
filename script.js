@@ -1,9 +1,24 @@
-// Protection contre le clic droit
+// 1. Protection contre le vol d'images
 document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('dragstart', e => {
+    if (e.target.nodeName === 'IMG') e.preventDefault();
+});
 
-// Animation au défilement (Scroll Reveal)
+// 2. Animation d'entrée (Preloader)
+window.addEventListener('load', () => {
+    const loader = document.getElementById('preloader');
+    if (loader) {
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+            document.body.classList.remove('loading');
+        }, 2000);
+    }
+});
+
+// 3. Animation au défilement (Reveal)
 const reveal = () => {
-    const reveals = document.querySelectorAll('.reveal');
+    const reveals = document.querySelectorAll('.reveal, .grid-item');
     reveals.forEach(el => {
         const windowHeight = window.innerHeight;
         const elementTop = el.getBoundingClientRect().top;
@@ -15,47 +30,23 @@ const reveal = () => {
 };
 
 window.addEventListener('scroll', reveal);
-// Lancer une fois au chargement
-window.onload = reveal;
 
-// Effet de parallaxe léger sur le Hero
-window.addEventListener('scroll', () => {
-    const heroContent = document.querySelector('.hero-content');
-    let scrollValue = window.scrollY;
-    heroContent.style.transform = `translateY(${scrollValue * 0.4}px)`;
-    heroContent.style.opacity = 1 - (scrollValue / 700);
-});
-// Gestion du Lightbox
+// 4. Gestion du Lightbox (Cliquer pour agrandir)
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
-const closeBtn = document.querySelector('.close-lightbox');
 
-document.querySelectorAll('.grid-item img').forEach(image => {
-    image.style.pointerEvents = "auto"; // On réactive le clic
-    image.addEventListener('click', () => {
-        lightbox.style.display = 'flex';
-        lightboxImg.src = image.src;
+document.querySelectorAll('.grid-item img').forEach(img => {
+    img.style.cursor = 'zoom-in';
+    img.addEventListener('click', () => {
+        if (lightbox && lightboxImg) {
+            lightbox.style.display = 'flex';
+            lightboxImg.src = img.src;
+        }
     });
 });
 
-closeBtn.addEventListener('click', () => {
-    lightbox.style.display = 'none';
-});
-
-lightbox.addEventListener('click', (e) => {
-    if(e.target !== lightboxImg) lightbox.style.display = 'none';
-});
-// Gestion de l'animation d'entrée
-window.addEventListener('load', () => {
-    const loader = document.getElementById('preloader');
-    
-    // On laisse l'animation se jouer au moins 2 secondes
-    setTimeout(() => {
-        loader.style.opacity = '0';
-        loader.style.visibility = 'hidden';
-        document.body.classList.remove('loading');
-    }, 2500);
-});
-
-// Ajouter la classe loading au début
-document.body.classList.add('loading');
+if (lightbox) {
+    lightbox.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+    });
+}
