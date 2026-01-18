@@ -92,11 +92,11 @@ nav {
 .about-text p { margin-bottom: 20px; line-height: 1.8; color: #ccc; font-size: 0.95rem; text-align: justify; }
 
 /* --- BOUTIQUE STYLES (ORDINATEUR & GÉNÉRAL) --- */
-.shop-page { background-color: #0a0a0a; }
-.shop-hero {
-    padding-top: 160px; padding-bottom: 60px;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    background: linear-gradient(to bottom, #050505, #0a0a0a); text-align: center;
+.shop-page .shop-hero {
+    padding-top: 180px; /* Augmente l'espace pour ne pas être caché par le menu */
+    background: #0a0a0a;
+    text-align: center;
+    padding-bottom: 60px;
 }
 .shop-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 8vw, 4rem); color: #fff; }
 .shop-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px 100px; }
