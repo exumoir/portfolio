@@ -283,4 +283,12 @@ footer { padding: 100px 50px; text-align: center; background: #050505; }
         height: 250px;
     }
     .post-content h2 { font-size: 1.6rem; }
+
+    .about-text p {
+    margin-bottom: 20px;
+    line-height: 1.8;
+    color: #ccc;
+    font-size: 0.95rem;
+    text-align: justify; /* Pour un look "Magazine" très propre */
+}
 }
