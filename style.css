@@ -112,6 +112,19 @@ nav {
 .btn-buy { display: inline-block; padding: 12px 35px; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; transition: 0.3s; }
 .btn-buy:hover { background: var(--gold); color: #000; }
 
+/* --- BLOG REGLAGES --- */
+.blog-post {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 60px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+}
+.post-image { flex: 1; height: 300px; overflow: hidden; }
+.post-content { flex: 1.5; }
+.post-content h2 { font-family: 'Playfair Display', serif; margin-bottom: 15px; color: var(--gold); }
+
 /* --- CONTACT & FOOTER --- */
 .contact-grid { display: flex; justify-content: center; gap: 30px; max-width: 1000px; margin: 60px auto; }
 .contact-card { flex: 1; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(196, 164, 132, 0.2); padding: 40px; text-align: center; text-decoration: none; color: #fff; transition: 0.4s; }
