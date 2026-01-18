@@ -112,18 +112,69 @@ nav {
 .btn-buy { display: inline-block; padding: 12px 35px; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; transition: 0.3s; }
 .btn-buy:hover { background: var(--gold); color: #000; }
 
-/* --- BLOG REGLAGES --- */
+/* --- BLOG PAGE STYLE --- */
+.blog-page .blog-hero {
+    padding-top: 180px; /* Espace pour le menu fixe */
+    text-align: center;
+    padding-bottom: 60px;
+}
+
+.blog-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 .blog-post {
     display: flex;
     gap: 40px;
-    margin-bottom: 60px;
+    margin-bottom: 80px;
     align-items: center;
     background: rgba(255, 255, 255, 0.02);
-    padding: 20px;
+    padding: 30px;
+    border: 1px solid rgba(196, 164, 132, 0.1);
+    transition: 0.4s;
 }
-.post-image { flex: 1; height: 300px; overflow: hidden; }
-.post-content { flex: 1.5; }
-.post-content h2 { font-family: 'Playfair Display', serif; margin-bottom: 15px; color: var(--gold); }
+
+.blog-post:hover {
+    border-color: var(--gold);
+    background: rgba(196, 164, 132, 0.05);
+}
+
+.post-image {
+    flex: 1;
+    height: 350px;
+    overflow: hidden;
+}
+
+.post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-content {
+    flex: 1.2;
+}
+
+.post-content h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--gold);
+    margin-bottom: 15px;
+}
+
+/* Version Mobile du Blog */
+@media (max-width: 768px) {
+    .blog-post {
+        flex-direction: column;
+        padding: 20px;
+    }
+    .post-image {
+        width: 100%;
+        height: 250px;
+    }
+}
 
 /* --- CONTACT & FOOTER --- */
 .contact-grid { display: flex; justify-content: center; gap: 30px; max-width: 1000px; margin: 60px auto; }
