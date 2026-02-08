@@ -3,113 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verco Photo | Portfolio Luxe</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon2.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon2.png">
-    <link rel="shortcut icon" href="favicon2.png">
+    <title>Portfolio | [Ton Nom/Pseudo]</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
 </head>
+<body>
 
-<body class="loading"> <div id="preloader">
-        <div class="preloader-content">
-            <img src="logo2.png" alt="Verco Photo" id="load-logo">
-            <div class="loader-line"></div>
-        </div>
-    </div>
+    <header class="header">
+        <a href="#" class="logo">Dev<span>Portfo.</span></a>
+        
+        <i class='bx bx-menu' id="menu-icon"></i>
 
-    <nav>
-        <div class="logo-container">
-            <a href="index.html"><img src="logo2.png" alt="Verco Photo Logo" id="main-logo"></a>
-        </div>
-        <ul class="nav-links">
-            <li><a href="#gallery">Galerie</a></li>
-            <li><a href="#about">À Propos</a></li>
-            <li><a href="boutique.html" style="color: var(--gold); font-weight: bold;">Boutique</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="blog.html">L'Atelier</a></li>
-        </ul>
-    </nav>
-
-    <header class="hero">
-        <div class="hero-content">
-            <h1 class="reveal">Capturer l'invisible</h1>
-            <p class="subtitle reveal">Photographie de Nature et moment  Haut de Gamme</p>
-            <a href="#gallery" class="btn-gold reveal">Découvrir l'univers</a>
-        </div>
+        <nav class="navbar">
+            <a href="#home" class="active">Accueil</a>
+            <a href="#about">À propos</a>
+            <a href="#skills">Compétences</a>
+            <a href="#portfolio">Projets</a>
+            <a href="#contact">Contact</a>
+        </nav>
     </header>
 
-    <section id="gallery" class="gallery-section">
-        <h2 class="section-title reveal">Portfolio</h2>
-        <div class="grid-container">
-    <div class="grid-item">
-        <img src="cascade.jpg" alt="Photographie artistique de mode sous une cascade - Shooting Verco Photo">
-    </div>
-    <div class="grid-item">
-        <img src="chemin.jpg" alt="Portrait éditorial en extérieur ambiance luxe et nature - Photographe Verco">
-    </div>
-    <div class="grid-item">
-        <img src="verte.jpg" alt="Portrait artistique féminin tons vert émeraude et lumière douce - Verco Photo">
-    </div>
-    <div class="grid-item">
-        <img src="nazaire.jpg" alt="Shooting photo mode urbaine et architecture à Saint-Nazaire - Verco Photo">
-    </div>
-    <div class="grid-item">
-        <img src="fleuve.jpeg" alt="Photographie de mode sensuelle en bord de fleuve - Style clair-obscur Verco">
-    </div>
-    <div class="grid-item">
-        <img src="lumiere.jpg" alt="Portrait de studio haute couture travail sur les ombres et la lumière - Verco Photo">
-    </div>
-</div>
+    <section class="home" id="home">
+        <div class="home-content">
+            <h3>Bonjour, c'est moi</h3>
+            <h1>[Ton Nom]</h1>
+            <h3>Et je suis <span class="multiple-text"></span></h3> <p>Passionné par le développement web et la création d'expériences numériques immersives. Je transforme vos idées en réalité digitale.</p>
+            
+            <div class="social-media">
+                <a href="#"><i class='bx bxl-linkedin'></i></a>
+                <a href="#"><i class='bx bxl-github'></i></a>
+                <a href="#"><i class='bx bxl-twitter'></i></a>
+                <a href="#"><i class='bx bxl-instagram'></i></a>
+            </div>
+            
+            <a href="#" class="btn">Télécharger mon CV</a>
+        </div>
+
+        <div class="home-img">
+            <div class="glowing-circle">
+                <span></span>
+                <span></span>
+                <img src="ton-image.png" alt="Photo de profil">
+            </div>
+        </div>
     </section>
-<section id="about" class="about-section reveal">
-    <div class="about-container">
-        <div class="about-image">
-            <img src="moi.webp" alt="Photographe professionnel Verco - Expert en portrait luxe et mode">
-            <div class="image-border"></div>
-        </div>
-        <div class="about-text">
-            <h2>L'Art du Regard</h2>
-            <p class="intro-text"><strong>L'élégance brute au service de l'émotion.</strong></p>
-            
-            <p>Basé sur la région de <strong>Saint-Nazaire</strong> et intervenant partout où la lumière l'appelle, Verco Photo redéfinit les codes du portrait haut de gamme. Mon travail se concentre sur une approche éditoriale de la photographie de mode, où chaque cliché est une pièce unique sculptée par le <strong>clair-obscur</strong>.</p>
-            
-            <p>En tant que <strong>photographe portraitiste</strong>, ma mission est de capturer l'invisible : cette étincelle de confiance, cette vulnérabilité maîtrisée ou cette force tranquille qui sommeille en chaque modèle. Mon expertise en <strong>éclairage de studio</strong> et en direction artistique me permet de sublimer les textures, les courbes et les regards pour créer des images qui ne se contentent pas d'être vues, mais qui sont ressenties.</p>
-            
-            <p>Que ce soit pour un <strong>book mannequin</strong>, une campagne de mode ou un portrait personnel de prestige, j'apporte une attention méticuleuse au détail et une esthétique cinématographique. Collaborer avec Verco Photo, c'est choisir une signature visuelle intemporelle, entre modernité sensuelle et classicisme luxueux.</p>
-            
-            <div class="signature">Verco Photo</div>
-        </div>
-    </div>
-</section>
-<footer id="contact">
-    <div class="footer-content">
-        <h2 class="reveal">Une vision, un projet ?</h2>
-        <p class="subtitle-contact reveal">Réservez votre séance exclusive</p>
 
-        <div class="contact-grid reveal">
-            <a href="mailto:dronefolie@gmail.com?subject=Demande de shooting - Verco Photo&body=Bonjour Verco, j'aimerais en savoir plus sur vos prestations pour..." class="contact-card">
-                <span class="card-label">Par Email</span>
-                <span class="card-value">dronefolie@gmail.com</span>
-                <span class="card-btn">Écrire un message</span>
-            </a>
-
-            <a href="https://wa.me/33777956630" target="_blank" class="contact-card">
-                <span class="card-label">WhatsApp / Direct</span>
-                <span class="card-value">07 77 95 66 30</span>
-                <span class="card-btn">Lancer la discussion</span>
-            </a>
+    <section class="about" id="about">
+        <div class="about-img">
+            <img src="about-img.png" alt="">
         </div>
-
-        <div class="socials-minimal reveal">
-            <a href="https://www.instagram.com/verco_photo" target="_blank">Instagram</a>
-            <span class="sep">|</span>
-            <a href="https://www.threads.net/@verco_photo" target="_blank">Threads</a>
+        <div class="about-content">
+            <h2 class="heading">À propos de <span>Moi</span></h2>
+            <h3>Développeur Full Stack</h3>
+            <p>Ici, tu peux décrire ton parcours. Mon approche est centrée sur l'utilisateur, en combinant design élégant et code performant. J'aime relever des défis techniques et apprendre de nouvelles technologies chaque jour.</p>
+            <a href="#" class="btn">En savoir plus</a>
         </div>
-        
-        <p class="copyright">VERCO PHOTO © 2026</p>
-    </div>
-</footer>
+    </section>
+
+    <section class="skills" id="skills">
+        <h2 class="heading">Mes <span>Compétences</span></h2>
+        <div class="skills-container">
+            <div class="skill-box">
+                <i class='bx bxl-html5'></i>
+                <h3>Frontend</h3>
+                <p>HTML5, CSS3, JavaScript, React</p>
+            </div>
+            <div class="skill-box">
+                <i class='bx bxl-nodejs'></i>
+                <h3>Backend</h3>
+                <p>Node.js, Express, MongoDB, SQL</p>
+            </div>
+            <div class="skill-box">
+                <i class='bx bx-palette'></i>
+                <h3>Design</h3>
+                <p>Figma, Adobe XD, Responsive Design</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="portfolio" id="portfolio">
+        <h2 class="heading">Derniers <span>Projets</span></h2>
+        <div class="portfolio-container">
+            <div class="portfolio-box">
+                <img src="projet1.jpg" alt="">
+                <div class="portfolio-layer">
+                    <h4>Web Design</h4>
+                    <p>Une application de gestion de tâches innovante.</p>
+                    <a href="#"><i class='bx bx-link-external'></i></a>
+                </div>
+            </div>
+            <div class="portfolio-box">
+                <img src="projet2.jpg" alt="">
+                <div class="portfolio-layer">
+                    <h4>E-Commerce</h4>
+                    <p>Plateforme de vente en ligne optimisée SEO.</p>
+                    <a href="#"><i class='bx bx-link-external'></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <h2 class="heading">Contactez-<span>Moi !</span></h2>
+        <form action="#">
+            <div class="input-box">
+                <input type="text" placeholder="Nom complet">
+                <input type="email" placeholder="Adresse Email">
+            </div>
+            <div class="input-box">
+                <input type="number" placeholder="Numéro de téléphone">
+                <input type="text" placeholder="Sujet du message">
+            </div>
+            <textarea name="" id="" cols="30" rows="10" placeholder="Votre Message"></textarea>
+            <input type="submit" value="Envoyer le message" class="btn">
+        </form>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-text">
+            <p>Copyright &copy; 2024 par [Ton Nom] | Tous droits réservés.</p>
+        </div>
+        <div class="footer-iconTop">
+            <a href="#home"><i class='bx bx-up-arrow-alt'></i></a>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="https://unpkg.com/scrollreveal"></script>
     <script src="script.js"></script>
 </body>
 </html>
