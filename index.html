@@ -3,133 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio | [Ton Nom/Pseudo]</title>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="style.css">
+    <title>EXUMOIR | VORTEX GALLERY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --text: #f0f0f0;
+            --accent: #ff3c00;
+        }
+
+        /* RESET & BASE */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden; /* Empêche le scroll horizontal parasite */
+            line-height: 1.6;
+        }
+
+        /* --- CURSEUR LOUPE --- */
+        #cursor {
+            position: fixed; width: 150px; height: 150px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background-repeat: no-repeat;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            display: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(255,255,255,0.2);
+            transform: translate(-50%, -50%);
+        }
+
+        /* --- UI ELEMENTS --- */
+        .reveal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; transition: 1.5s ease-in-out; }
+        .grain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.04; pointer-events: none; z-index: 50; }
+
+        nav { position: fixed; top: 0; width: 100%; padding: 40px; display: flex; justify-content: space-between; z-index: 100; mix-blend-mode: difference; }
+        .logo { font-family: 'Italiana', serif; font-size: 1.8rem; letter-spacing: 2px; }
+
+        /* --- GALLERY SYSTEM --- */
+        .section-gallery { height: 100vh; position: sticky; top: 0; overflow: hidden; }
+
+        .gallery-wrapper {
+            display: flex;
+            align-items: center;
+            height: 100vh;
+            padding: 0 10vw;
+            gap: 10vw;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
+        }
+
+        .gallery-item {
+            position: relative; flex-shrink: 0; width: 30vw; height: 60vh;
+            background: #151515; overflow: hidden;
+            transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+            filter: grayscale(1); background-size: cover; background-position: center;
+            cursor: none;
+        }
+        .gallery-item:hover { width: 40vw; filter: grayscale(0); }
+
+        .item-info { position: absolute; bottom: -50px; left: 20px; transition: 0.5s; }
+        .gallery-item:hover .item-info { bottom: 20px; }
+        .item-info h2 { font-family: 'Italiana', serif; font-size: 2.5rem; }
+
+        /* IMAGES DATA */
+        .item-1 { background-image: url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1000'); }
+        .item-2 { background-image: url('https://images.unsplash.com/photo-1506318137071-a8e063b4b519?q=80&w=1000'); }
+        .item-3 { background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000'); }
+        .item-4 { background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000'); }
+        .item-5 { background-image: url('https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1000'); }
+
+        .progress-container { position: fixed; bottom: 50px; left: 10%; width: 80%; height: 2px; background: rgba(255,255,255,0.1); z-index: 100; }
+        .progress-bar { width: 0%; height: 100%; background: var(--accent); transition: 0.1s; }
+
+        /* --- CONTACT SECTION --- */
+        .cyber-contact { min-height: 100vh; padding: 150px 10%; background: #050505; border-top: 1px solid var(--accent); position: relative; z-index: 2; }
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; width: 100%; }
+        .contact-header h1 { font-family: 'Italiana', serif; font-size: clamp(3rem, 8vw, 5rem); line-height: 0.9; margin-top: 20px;}
+
+        .glitch { position: relative; font-size: 0.8rem; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
+        .status-light { width: 10px; height: 10px; background: var(--accent); display: inline-block; border-radius: 50%; box-shadow: 0 0 15px var(--accent); animation: blink 1s infinite; margin-right: 10px; }
+
+        .cyber-form { display: flex; flex-direction: column; gap: 40px; }
+        .input-group { position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .input-group label { display: block; font-size: 0.7rem; color: var(--accent); letter-spacing: 3px; margin-bottom: 10px; }
+        .input-group input, .input-group textarea { width: 100%; background: transparent; border: none; color: white; padding: 10px 0; font-family: inherit; font-size: 1.2rem; outline: none; }
+
+        .scan-line { position: absolute; bottom: -1px; left: 0; width: 0%; height: 2px; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: 0.5s ease; }
+        .input-group input:focus ~ .scan-line { width: 100%; }
+
+        .cyber-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 25px; font-weight: bold; letter-spacing: 5px; cursor: pointer; transition: 0.3s; }
+        .cyber-btn:hover { background: var(--accent); color: black; box-shadow: 0 0 30px var(--accent); }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .section-gallery { height: auto; position: relative; }
+            .gallery-wrapper { flex-direction: column; height: auto; padding: 120px 5%; gap: 50px; transform: none !important; }
+            .gallery-item { width: 100%; height: 45vh; filter: grayscale(0); }
+            #cursor { display: none !important; }
+            .contact-grid { grid-template-columns: 1fr; gap: 60px; }
+            .progress-container { display: none; }
+        }
+    </style>
 </head>
-<body>
+<body onload="document.querySelector('.reveal').style.transform = 'translateY(-100%)'">
 
-    <header class="header">
-        <a href="#" class="logo">Dev<span>Portfo.</span></a>
-        
-        <i class='bx bx-menu' id="menu-icon"></i>
+    <div class="reveal"></div>
+    <div id="cursor"></div>
+    <div class="grain"></div>
 
-        <nav class="navbar">
-            <a href="#home" class="active">Accueil</a>
-            <a href="#about">À propos</a>
-            <a href="#skills">Compétences</a>
-            <a href="#portfolio">Projets</a>
-            <a href="#contact">Contact</a>
-        </nav>
-    </header>
+    <nav>
+        <div class="logo">EXUMOIR_STUDIO</div>
+        <div style="font-size: 0.8rem; letter-spacing: 2px;">© 2026</div>
+    </nav>
 
-    <section class="home" id="home">
-        <div class="home-content">
-            <h3>Bonjour, c'est moi</h3>
-            <h1>[Ton Nom]</h1>
-            <h3>Et je suis <span class="multiple-text"></span></h3> <p>Passionné par le développement web et la création d'expériences numériques immersives. Je transforme vos idées en réalité digitale.</p>
-            
-            <div class="social-media">
-                <a href="#"><i class='bx bxl-linkedin'></i></a>
-                <a href="#"><i class='bx bxl-github'></i></a>
-                <a href="#"><i class='bx bxl-twitter'></i></a>
-                <a href="#"><i class='bx bxl-instagram'></i></a>
-            </div>
-            
-            <a href="#" class="btn">Télécharger mon CV</a>
+    <div class="section-gallery">
+        <div class="gallery-wrapper" id="slider">
+            <div class="gallery-item item-1"><div class="item-info"><span>#01</span><h2>CYBER_DREAM</h2></div></div>
+            <div class="gallery-item item-2"><div class="item-info"><span>#02</span><h2>NEON_SOUL</h2></div></div>
+            <div class="gallery-item item-3"><div class="item-info"><span>#03</span><h2>VOID_ARCH</h2></div></div>
+            <div class="gallery-item item-4"><div class="item-info"><span>#04</span><h2>DARK_MATTER</h2></div></div>
+            <div class="gallery-item item-5"><div class="item-info"><span>#05</span><h2>GLITCH_GEN</h2></div></div>
         </div>
+    </div>
 
-        <div class="home-img">
-            <div class="glowing-circle">
-                <span></span>
-                <span></span>
-                <img src="ton-image.png" alt="Photo de profil">
-            </div>
-        </div>
-    </section>
+    <div class="progress-container"><div class="progress-bar" id="bar"></div></div>
 
-    <section class="about" id="about">
-        <div class="about-img">
-            <img src="about-img.png" alt="">
-        </div>
-        <div class="about-content">
-            <h2 class="heading">À propos de <span>Moi</span></h2>
-            <h3>Développeur Full Stack</h3>
-            <p>Ici, tu peux décrire ton parcours. Mon approche est centrée sur l'utilisateur, en combinant design élégant et code performant. J'aime relever des défis techniques et apprendre de nouvelles technologies chaque jour.</p>
-            <a href="#" class="btn">En savoir plus</a>
-        </div>
-    </section>
-
-    <section class="skills" id="skills">
-        <h2 class="heading">Mes <span>Compétences</span></h2>
-        <div class="skills-container">
-            <div class="skill-box">
-                <i class='bx bxl-html5'></i>
-                <h3>Frontend</h3>
-                <p>HTML5, CSS3, JavaScript, React</p>
+    <section class="cyber-contact">
+        <div class="contact-grid">
+            <div class="contact-header">
+                <span class="status-light"></span>
+                <p class="glitch" data-text="ESTABLISH_CONNECTION">ESTABLISH_CONNECTION</p>
+                <h1>PRÊT À<br>INJECTER ?</h1>
             </div>
-            <div class="skill-box">
-                <i class='bx bxl-nodejs'></i>
-                <h3>Backend</h3>
-                <p>Node.js, Express, MongoDB, SQL</p>
-            </div>
-            <div class="skill-box">
-                <i class='bx bx-palette'></i>
-                <h3>Design</h3>
-                <p>Figma, Adobe XD, Responsive Design</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="portfolio" id="portfolio">
-        <h2 class="heading">Derniers <span>Projets</span></h2>
-        <div class="portfolio-container">
-            <div class="portfolio-box">
-                <img src="projet1.jpg" alt="">
-                <div class="portfolio-layer">
-                    <h4>Web Design</h4>
-                    <p>Une application de gestion de tâches innovante.</p>
-                    <a href="#"><i class='bx bx-link-external'></i></a>
+            <form class="cyber-form">
+                <div class="input-group">
+                    <label>ID_UTILISATEUR</label>
+                    <input type="text" placeholder="NOM..." required>
+                    <div class="scan-line"></div>
                 </div>
-            </div>
-            <div class="portfolio-box">
-                <img src="projet2.jpg" alt="">
-                <div class="portfolio-layer">
-                    <h4>E-Commerce</h4>
-                    <p>Plateforme de vente en ligne optimisée SEO.</p>
-                    <a href="#"><i class='bx bx-link-external'></i></a>
+                <div class="input-group">
+                    <label>CANAL</label>
+                    <input type="email" placeholder="EMAIL..." required>
+                    <div class="scan-line"></div>
                 </div>
-            </div>
+                <div class="input-group">
+                    <label>TRANSMISSION</label>
+                    <textarea rows="4" placeholder="VOTRE MESSAGE..."></textarea>
+                    <div class="scan-line"></div>
+                </div>
+                <button type="submit" class="cyber-btn">TRANSMETTRE_PAQUET</button>
+            </form>
         </div>
     </section>
 
-    <section class="contact" id="contact">
-        <h2 class="heading">Contactez-<span>Moi !</span></h2>
-        <form action="#">
-            <div class="input-box">
-                <input type="text" placeholder="Nom complet">
-                <input type="email" placeholder="Adresse Email">
-            </div>
-            <div class="input-box">
-                <input type="number" placeholder="Numéro de téléphone">
-                <input type="text" placeholder="Sujet du message">
-            </div>
-            <textarea name="" id="" cols="30" rows="10" placeholder="Votre Message"></textarea>
-            <input type="submit" value="Envoyer le message" class="btn">
-        </form>
-    </section>
+    <script>
+        const cursor = document.getElementById('cursor');
+        const slider = document.getElementById('slider');
+        const bar = document.getElementById('bar');
+        let scrollPos = 0;
 
-    <footer class="footer">
-        <div class="footer-text">
-            <p>Copyright &copy; 2024 par [Ton Nom] | Tous droits réservés.</p>
-        </div>
-        <div class="footer-iconTop">
-            <a href="#home"><i class='bx bx-up-arrow-alt'></i></a>
-        </div>
-    </footer>
+        // LOUPE DYNAMIQUE
+        document.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            cursor.style.left = clientX + 'px';
+            cursor.style.top = clientY + 'px';
 
-    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
-    <script src="https://unpkg.com/scrollreveal"></script>
-    <script src="script.js"></script>
+            const target = document.elementFromPoint(clientX, clientY);
+            const item = target ? target.closest('.gallery-item') : null;
+
+            if (item && window.innerWidth > 768) {
+                const rect = item.getBoundingClientRect();
+                const x = ((clientX - rect.left) / rect.width) * 100;
+                const y = ((clientY - rect.top) / rect.height) * 100;
+
+                cursor.style.display = 'block';
+                cursor.style.backgroundImage = window.getComputedStyle(item).backgroundImage;
+                cursor.style.backgroundSize = (rect.width * 2) + 'px';
+                cursor.style.backgroundPosition = `${x}% ${y}%`;
+            } else {
+                cursor.style.display = 'none';
+            }
+        });
+
+        // SCROLL HYBRIDE (Horizontal puis vertical libéré)
+        window.addEventListener('wheel', (e) => {
+            if (window.innerWidth <= 768) return; // Désactive sur mobile
+
+            const maxScroll = slider.scrollWidth - window.innerWidth + (window.innerWidth * 0.1);
+
+            // Si on est en haut de page, on fait défiler la galerie
+            if (window.scrollY < 10) {
+                if ((scrollPos < maxScroll && e.deltaY > 0) || (scrollPos > 0 && e.deltaY < 0)) {
+                    e.preventDefault();
+                    scrollPos += e.deltaY;
+                    scrollPos = Math.max(0, Math.min(scrollPos, maxScroll));
+                    slider.style.transform = `translateX(${-scrollPos}px)`;
+                    bar.style.width = (scrollPos / maxScroll * 100) + "%";
+                }
+            }
+        }, { passive: false });
+
+        // FORMULAIRE MATRIX
+        document.querySelector('.cyber-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.querySelector('.cyber-btn');
+            btn.disabled = true;
+            let count = 0;
+            const interval = setInterval(() => {
+                btn.innerHTML = `UPLOADING_${Math.random().toString(16).substring(2, 7)}...`;
+                count++;
+                if (count > 15) {
+                    clearInterval(interval);
+                    btn.innerHTML = "DATA_SYNC_SUCCESS";
+                    btn.style.background = "var(--accent)";
+                    btn.style.color = "black";
+                }
+            }, 60);
+        });
+    </script>
 </body>
 </html>
