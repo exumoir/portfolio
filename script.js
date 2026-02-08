@@ -1,58 +1,94 @@
-// 1. GESTION DU PRELOADER (SORTIE DE L'ÉCRAN NOIR)
-function hidePreloader() {
+/**
+ * 1. GESTION DU PRELOADER & INITIALISATION
+ */
+const hidePreloader = () => {
     const loader = document.getElementById('preloader');
     if (loader) {
         loader.style.opacity = '0';
         setTimeout(() => {
             loader.style.display = 'none';
             document.body.classList.remove('loading');
-        }, 1000); 
+            // On lance les animations après la disparition du loader
+            initAnimations();
+        }, 800); 
     }
-}
-
-// Sécurité : Si le site met trop de temps (ex: connexion lente), on force l'affichage après 3s
-setTimeout(hidePreloader, 3000);
-window.addEventListener('load', hidePreloader);
-
-// 2. ANIMATION AU SCROLL (REVEAL)
-const reveal = () => {
-    const reveals = document.querySelectorAll('.reveal, .grid-item');
-    reveals.forEach(el => {
-        const windowHeight = window.innerHeight;
-        const elementTop = el.getBoundingClientRect().top;
-        const elementVisible = 100;
-        if (elementTop < windowHeight - elementVisible) {
-            el.classList.add('active');
-        }
-    });
 };
 
-window.addEventListener('scroll', reveal);
-window.addEventListener('load', reveal); // Lance l'anim au chargement pour les éléments déjà visibles
+window.addEventListener('load', hidePreloader);
+setTimeout(hidePreloader, 3500); // Sécurité
 
-// 3. GESTION DU LIGHTBOX (CLIC SUR IMAGE)
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightbox-img');
+/**
+ * 2. MENU MOBILE & NAVIGATION ACTIVE
+ */
+const menuIcon = document.querySelector('#menu-icon');
+const navbar = document.querySelector('.navbar');
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('header nav a');
 
-document.querySelectorAll('.grid-item img').forEach(img => {
-    // On réactive les clics qui étaient bloqués par pointer-events:none
-    img.style.pointerEvents = 'auto'; 
-    img.style.cursor = 'zoom-in';
+menuIcon.onclick = () => {
+    menuIcon.classList.toggle('bx-x'); // Animation de l'icône menu
+    navbar.classList.toggle('active');
+};
 
-    img.addEventListener('click', () => {
-        if (lightbox && lightboxImg) {
-            lightbox.style.display = 'flex';
-            lightboxImg.src = img.src;
+window.onscroll = () => {
+    sections.forEach(sec => {
+        let top = window.scrollY;
+        let offset = sec.offsetTop - 150;
+        let height = sec.offsetHeight;
+        let id = sec.getAttribute('id');
+
+        if(top >= offset && top < offset + height) {
+            navLinks.forEach(links => {
+                links.classList.remove('active');
+                document.querySelector('header nav a[href*=' + id + ']').classList.add('active');
+            });
         }
     });
-});
 
-// Fermer le lightbox en cliquant n'importe où
-if (lightbox) {
-    lightbox.addEventListener('click', () => {
-        lightbox.style.display = 'none';
+    // Sticky header au scroll
+    document.querySelector('.header').classList.toggle('sticky', window.scrollY > 100);
+
+    // Fermeture auto du menu mobile au clic/scroll
+    menuIcon.classList.remove('bx-x');
+    navbar.classList.remove('active');
+};
+
+/**
+ * 3. EFFET DE TEXTE DYNAMIQUE (TYPED.JS)
+ */
+const initAnimations = () => {
+    if (document.querySelector('.multiple-text')) {
+        new Typed('.multiple-text', {
+            strings: ['Développeur Full Stack', 'Designer UI/UX', 'Passionné de Tech'],
+            typeSpeed: 70,
+            backSpeed: 50,
+            backDelay: 1500,
+            loop: true
+        });
+    }
+
+    /**
+     * 4. SCROLL REVEAL (Apparition fluide des éléments)
+     */
+    const sr = ScrollReveal({
+        distance: '60px',
+        duration: 2000,
+        delay: 200,
+        reset: false // Ne se rejoue pas à chaque fois pour la performance
     });
-}
 
-// 4. PROTECTION IMAGES (CLIC DROIT)
-document.addEventListener('contextmenu', e => e.preventDefault());
+    sr.reveal('.home-content, .heading', { origin: 'top' });
+    sr.reveal('.home-img, .skills-container, .portfolio-box, .contact form', { origin: 'bottom' });
+    sr.reveal('.home-content h1, .about-img', { origin: 'left' });
+    sr.reveal('.home-content p, .about-content', { origin: 'right' });
+};
+
+/**
+ * 5. GESTION DU LIGHTBOX AMÉLIORÉ
+ */
+const setupLightbox = () => {
+    const lightbox = document.createElement('div');
+    lightbox.id = 'lightbox';
+    document.body.appendChild(lightbox);
+
+    document.querySelectorAll('.portfolio-box img, .grid-item
