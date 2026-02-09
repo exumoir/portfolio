@@ -1,201 +1,467 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORE.IX | OMNIPOTENCE DIGITALE</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORE.IX | ARCHITECTE CYBERNÉTIQUE</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
-    <style>
-        :root {
-            --neon: #00f2ff;
-            --magenta: #ff0077;
-            --dark: #000000;
-        }
+  <style>
+    :root {
+      --primary-neon: #00f2ff; /* Cyan */
+      --secondary-neon: #ff0077; /* Magenta */
+      --bg-dark: #000000; /* Noir OLED */
+      --text-light: #e0e0e0;
+      --glass-effect: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
 
-        body {
-            margin: 0; background: var(--dark); color: white;
-            font-family: 'Space Grotesk', sans-serif; overflow: hidden;
-            user-select: none;
-        }
+    body {
+      margin: 0;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow: hidden; /* Toute la navigation est 3D */
+      cursor: none; /* Curseur 3D */
+    }
 
-        #webgl-canvas { position: fixed; top: 0; left: 0; outline: none; z-index: 1; }
+    /* --- GLOBAL CANVAS --- */
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      outline: none;
+    }
 
-        /* UI OVERLAY */
-        #interface {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10; pointer-events: none;
-        }
+    /* --- UI OVERLAY (Non-3D elements) --- */
+    #ui-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none; /* Laisse interagir avec le canvas */
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .nav-link {
-            pointer-events: auto; color: white !important; font-family: 'Syncopate';
-            font-size: 0.8rem; letter-spacing: 2px; transition: 0.3s;
-        }
-        .nav-link:hover { color: var(--neon) !important; text-shadow: 0 0 15px var(--neon); }
+    .navbar {
+      backdrop-filter: blur(15px);
+      background: rgba(0,0,0,0.7);
+      border-bottom: 1px solid var(--glass-border);
+      pointer-events: auto; /* Réactiver les clics sur la nav */
+      flex-shrink: 0; /* Ne pas se compresser */
+    }
 
-        .section-content {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80%; max-width: 800px; opacity: 0; transition: 1s;
-            pointer-events: none; text-align: center;
-        }
-        .section-content.visible { opacity: 1; pointer-events: auto; }
+    .navbar-brand {
+      font-family: 'Syncopate', sans-serif;
+      font-weight: 700;
+      color: var(--primary-neon) !important;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px var(--primary-neon);
+    }
 
-        .glitch-title {
-            font-family: 'Syncopate'; font-size: 8vw; font-weight: 700;
-            text-transform: uppercase; line-height: 0.8;
-            background: linear-gradient(45deg, #fff, var(--neon));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+    .nav-link {
+      color: var(--text-light) !important;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.3s, text-shadow 0.3s;
+      margin-left: 15px;
+    }
+    .nav-link:hover {
+      color: var(--primary-neon) !important;
+      text-shadow: 0 0 10px var(--primary-neon), 0 0 20px var(--primary-neon);
+    }
 
-        /* BTN START */
-        #init-btn {
-            position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
-            padding: 15px 40px; border: 1px solid var(--neon);
-            background: rgba(0,242,255,0.1); color: var(--neon);
-            font-family: 'Syncopate'; cursor: pointer; z-index: 100;
-            pointer-events: auto; transition: 0.5s;
-        }
-        #init-btn:hover { background: var(--neon); color: black; box-shadow: 0 0 30px var(--neon); }
-    </style>
+    /* --- HERO TEXT (Géré par Three.js et CSS pour le positionnement) --- */
+    #hero-main-title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(3rem, 12vw, 8rem);
+      font-weight: 700;
+      text-align: center;
+      line-height: 0.9;
+      background: linear-gradient(to right, #ffffff, var(--primary-neon));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      opacity: 0; /* Géré par JS */
+      transition: opacity 2s ease-out;
+      pointer-events: none;
+      z-index: 1; /* Pour être au-dessus des éléments 3D */
+    }
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
-                "gsap": "https://cdn.skypack.dev/gsap"
-            }
-        }
-    </script>
+    #hero-subtitle {
+      position: absolute;
+      top: calc(50% + clamp(2rem, 3vw, 4rem)); /* Sous le titre */
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(0.8rem, 2vw, 1.5rem);
+      text-align: center;
+      color: var(--secondary-neon);
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      opacity: 0; /* Géré par JS */
+      transition: opacity 2.5s ease-out;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* --- SECTION MODULES (Gérés dynamiquement par JS pour l'affichage) --- */
+    .section-module {
+      position: absolute;
+      left: 50%;
+      width: 80%;
+      max-width: 900px;
+      transform: translateX(-50%) translateY(-50%); /* Centrage */
+      padding: 40px;
+      background: var(--glass-effect);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      opacity: 0; /* Géré par JS */
+      pointer-events: none; /* Par défaut, invisible et non cliquable */
+      transition: opacity 0.8s ease-out;
+    }
+    .section-module.active {
+      opacity: 1;
+      pointer-events: auto; /* Re-cliquable quand active */
+    }
+
+    /* --- TERMINAL CARD --- */
+    .terminal-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--primary-neon);
+      box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+    }
+    .terminal-input {
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 1px dashed var(--primary-neon) !important;
+      color: var(--primary-neon) !important;
+      font-family: 'Courier New', monospace;
+      border-radius: 0;
+    }
+    .btn-submit-terminal {
+      background: var(--primary-neon);
+      color: var(--bg-dark);
+      font-family: 'Syncopate', sans-serif;
+      letter-spacing: 2px;
+      transition: all 0.3s;
+    }
+    .btn-submit-terminal:hover {
+      background: var(--secondary-neon);
+      box-shadow: 0 0 15px var(--secondary-neon);
+    }
+
+    /* --- CUSTOM CURSOR (3D, mais on laisse un point pour les interactions 2D) --- */
+    .custom-cursor-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary-neon);
+      border-radius: 50%;
+      position: fixed;
+      top: var(--mouse-y);
+      left: var(--mouse-x);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: difference;
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
 
-    <button id="init-btn">INITIALISER LE SYSTÈME</button>
-    <canvas id="webgl-canvas"></canvas>
+  <div class="custom-cursor-dot" style="--mouse-x:0px; --mouse-y:0px;"></div>
+  <canvas id="webgl-canvas"></canvas>
 
-    <div id="interface">
-        <nav class="navbar navbar-expand px-4 py-3">
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="#" onclick="moveCam(0, 30, 0, 'lab')">LAB</a>
-                <a class="nav-link" href="#" onclick="moveCam(20, 0, 20, 'data')">DATA</a>
-                <a class="nav-link" href="#" onclick="moveCam(-20, -10, 10, 'comm')">COMM</a>
-            </div>
-        </nav>
-
-        <div id="hero" class="section-content visible">
-            <h1 class="glitch-title">CORE.IX</h1>
-            <p class="text-uppercase tracking-widest text-info mt-3">Architecte de Réalités Digitales</p>
+  <div id="ui-overlay">
+    <nav class="navbar navbar-expand-lg navbar-dark px-3">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">CORE.IX</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="#" data-target-id="section-lab" data-target-position="0,25,0">LAB</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-target-id="section-data" data-target-position="0,0,0">DATA</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-target-id="section-comm" data-target-position="0,-25,0">COMM</a></li>
+          </ul>
         </div>
+      </div>
+    </nav>
 
-        <div id="lab" class="section-content">
-            <h2 class="display-3 fw-bold">PROJETS_01</h2>
-            <p class="lead text-white-50">Exploration volumétrique et shaders avancés.</p>
+    <div id="hero-main-title">CORE.IX</div>
+    <div id="hero-subtitle">SYSTEM OVERLOAD</div>
+
+    <div id="section-lab" class="section-module">
+      <h2 class="text-white fw-bold mb-4"><span style="color:var(--primary-neon)">///</span> LAB_PROJECTS</h2>
+      <p class="text-white-50 mb-4">Exploration des architectures WebGL et des expériences immersives.</p>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="glass-card p-3">
+            <h5 class="text-primary-neon">NEON_ARCHIVE <i class="bi bi-arrow-up-right"></i></h5>
+            <p class="small text-white-50">Gestion de données volumétriques en temps réel.</p>
+          </div>
         </div>
+        <div class="col-md-6">
+          <div class="glass-card p-3">
+            <h5 class="text-primary-neon">GLITCH_ENGINE <i class="bi bi-arrow-up-right"></i></h5>
+            <p class="small text-white-50">Développement de shaders personnalisés pour effets visuels avancés.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import gsap from 'gsap';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    <div id="section-data" class="section-module">
+      <h2 class="text-white fw-bold mb-4"><span style="color:var(--primary-neon)">///</span> DATA_STREAM</h2>
+      <p class="text-white-50 mb-4">Analyse de ma stack technologique et de mes compétences principales.</p>
+      <ul class="list-unstyled">
+        <li><i class="bi bi-code-slash text-primary-neon me-2"></i> Three.js (Core Engine)</li>
+        <li><i class="bi bi-lightbulb text-primary-neon me-2"></i> WebGPU (Next-Gen Graphics API)</li>
+        <li><i class="bi bi-tools text-primary-neon me-2"></i> GLSL & Custom Shaders</li>
+        <li><i class="bi bi-diagram-3 text-primary-neon me-2"></i> Full-Stack Architecture (Node.js / React)</li>
+      </ul>
+    </div>
 
-        let scene, camera, renderer, composer, grid;
-        const mouse = new THREE.Vector2();
+    <div id="section-comm" class="section-module">
+      <h2 class="text-white fw-bold mb-4"><span style="color:var(--primary-neon)">///</span> COMM_LINK</h2>
+      <div class="terminal-card p-4">
+        <p class="text-primary-neon small mb-3">> INITIALIZING PROTOCOL...</p>
+        <form>
+          <div class="mb-3">
+            <label class="form-label text-white-50 small">IDENT_NAME</label>
+            <input type="text" class="form-control terminal-input" placeholder="_">
+          </div>
+          <div class="mb-4">
+            <label class="form-label text-white-50 small">MESSAGE_STREAM</label>
+            <textarea class="form-control terminal-input" rows="3" placeholder="_"></textarea>
+          </div>
+          <button type="submit" class="btn btn-submit-terminal w-100">SEND PACKET <i class="bi bi-send-fill ms-2"></i></button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://unpkg.com/gsap@3.9.1/dist/gsap.min.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+    // --- SETUP BASIQUE ---
+    const canvas = document.querySelector('#webgl-canvas');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x010101, 0.03); // Brouillard ambiant
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 30); // Position de départ
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+
+    // --- POST-PROCESSING (BLOOM) ---
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.8, 0.8, 0.0);
+    composer.addPass(bloomPass);
+    composer.addPass(new OutputPass());
+
+    // --- GRILLE DE DONNÉES DYNAMIQUE (InstancedMesh) ---
+    const gridSize = 100;
+    const numInstances = gridSize * gridSize;
+    const instanceGeometry = new THREE.PlaneGeometry(0.8, 0.8);
+    const instanceMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0x00f2ff, 
+      emissive: 0x00f2ff, 
+      emissiveIntensity: 0.8, 
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.3 // Légèrement transparent
+    });
+    
+    const dataGrid = new THREE.InstancedMesh(instanceGeometry, instanceMaterial, numInstances);
+    scene.add(dataGrid);
+
+    const dummy = new THREE.Object3D();
+    const gridInstances = [];
+
+    for (let x = 0; x < gridSize; x++) {
+      for (let y = 0; y < gridSize; y++) {
+        const i = x * gridSize + y;
+        const posX = (x - gridSize / 2 + 0.5) * 2;
+        const posY = (y - gridSize / 2 + 0.5) * 2;
+        const posZ = (Math.random() - 0.5) * 50; // Random Z pour profondeur
         
-        // --- INITIALISATION ---
-        function init() {
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x000000, 0.02);
+        dummy.position.set(posX, posY, posZ);
+        dummy.rotation.x = Math.PI * 0.5; // Aligner les plans vers le ciel/sol
+        dummy.updateMatrix();
+        dataGrid.setMatrixAt(i, dummy.matrix);
+        gridInstances.push({
+            originalZ: posZ,
+            offset: Math.random() * Math.PI * 2 // Pour la pulsation
+        });
+      }
+    }
+    dataGrid.instanceMatrix.needsUpdate = true;
+    dataGrid.matrixAutoUpdate = false; // Optimisation: géré manuellement
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            camera.position.z = 50;
+    // --- CURSEUR 3D ---
+    const cursorGeometry = new THREE.RingGeometry(0.1, 0.2, 8);
+    const cursorMaterial = new THREE.MeshBasicMaterial({ color: var_primary_neon, emissive: var_primary_neon, emissiveIntensity: 5 });
+    const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
+    scene.add(cursor);
 
-            renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#webgl-canvas'), antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+    // --- INTERACTION SOURIS & RAYCASTING ---
+    const mouse = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
 
-            // POST-PROCESSING
-            composer = new EffectComposer(renderer);
-            composer.addPass(new RenderPass(scene, camera));
-            const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-            composer.addPass(bloom);
+    window.addEventListener('mousemove', (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-            createGrid();
-            animate();
+      // Met à jour la position du custom cursor 2D
+      document.documentElement.style.setProperty('--mouse-x', `${event.clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${event.clientY}px`);
+    });
+
+    // --- NAVIGATION SPATIALE (GSAP) ---
+    const cameraTarget = new THREE.Vector3();
+    let currentSectionId = 'hero'; // Pour la gestion des modules HTML
+    
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        const targetPosString = event.target.dataset.targetPosition;
+        const targetId = event.target.dataset.targetId;
+
+        if (targetPosString) {
+          const [x, y, z] = targetPosString.split(',').map(Number);
+          
+          gsap.to(camera.position, {
+            x: x,
+            y: y,
+            z: z + 20, // Toujours un peu en avant de la section
+            duration: 2,
+            ease: "power2.inOut",
+            onUpdate: () => {
+                // S'assurer que la caméra regarde toujours le centre
+                camera.lookAt(x, y, z);
+            },
+            onComplete: () => {
+                currentSectionId = targetId;
+            }
+          });
         }
+      });
+    });
 
-        // --- LA MATRICE (GRID) ---
-        function createGrid() {
-            const size = 100;
-            const divisions = 40;
-            const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.5 });
-            
-            grid = new THREE.InstancedMesh(geometry, material, divisions * divisions);
-            const dummy = new THREE.Object3D();
-            let i = 0;
-            for(let x = 0; x < divisions; x++) {
-                for(let y = 0; y < divisions; y++) {
-                    dummy.position.set((x - divisions/2) * 4, (y - divisions/2) * 4, 0);
-                    dummy.updateMatrix();
-                    grid.setMatrixAt(i++, dummy.matrix);
+    // --- GESTION DYNAMIQUE DES SECTIONS HTML ---
+    const allSectionModules = document.querySelectorAll('.section-module');
+
+    function updateHtmlSections() {
+        allSectionModules.forEach(section => {
+            if (section.id === currentSectionId) {
+                if (!section.classList.contains('active')) {
+                    section.classList.add('active');
+                }
+            } else {
+                if (section.classList.contains('active')) {
+                    section.classList.remove('active');
                 }
             }
-            scene.add(grid);
-        }
-
-        // --- NAVIGATION SPATIALE ---
-        window.moveCam = (x, y, z, sectionId) => {
-            gsap.to(camera.position, { x, y, z: z + 30, duration: 2.5, ease: "expo.inOut" });
-            
-            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('visible'));
-            document.getElementById(sectionId).classList.add('visible');
-        };
-
-        // --- AUDIO ENGINE ---
-        const initBtn = document.querySelector('#init-btn');
-        initBtn.onclick = () => {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(50, audioCtx.currentTime); 
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            
-            gsap.to(initBtn, { opacity: 0, pointerEvents: 'none' });
-            init();
-        };
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = Date.now() * 0.001;
-            
-            // Faire "respirer" la grille
-            grid.rotation.z = Math.sin(time * 0.1) * 0.1;
-            grid.rotation.y = Math.cos(time * 0.1) * 0.1;
-
-            composer.render();
-        }
-
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-            
-            gsap.to(camera.rotation, { 
-                y: -mouse.x * 0.1, 
-                x: mouse.y * 0.1, 
-                duration: 1 
-            });
         });
+    }
 
-    </script>
+    // --- ANIMATION LOOP ---
+    const clock = new THREE.Clock();
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        const elapsedTime = clock.getElapsedTime();
+
+        // Animation de la grille de données
+        for (let i = 0; i < numInstances; i++) {
+            const instance = gridInstances[i];
+            
+            dummy.position.x = (i % gridSize - gridSize / 2 + 0.5) * 2;
+            dummy.position.y = (Math.floor(i / gridSize) - gridSize / 2 + 0.5) * 2;
+            
+            // Pulsation dynamique sur l'axe Z
+            dummy.position.z = instance.originalZ + Math.sin(elapsedTime * 0.5 + instance.offset) * 2;
+            
+            dummy.rotation.x = Math.PI * 0.5; // Aligner les plans
+            dummy.scale.setScalar(1 + Math.sin(elapsedTime * 0.2 + instance.offset * 0.5) * 0.1); // Effet de battement
+            
+            dummy.updateMatrix();
+            dataGrid.setMatrixAt(i, dummy.matrix);
+        }
+        dataGrid.instanceMatrix.needsUpdate = true;
+
+        // Mise à jour du curseur 3D
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(scene.children); // Raycast sur les objets 3D
+
+        if (intersects.length > 0) {
+            cursor.position.copy(intersects[0].point);
+            cursor.lookAt(camera.position); // Le curseur regarde la caméra
+        } else {
+            // Si le curseur ne touche pas un objet, le placer sur le plan de la caméra
+            cursor.position.set(camera.position.x + mouse.x * 5, camera.position.y + mouse.y * 5, camera.position.z - 5);
+        }
+        cursor.rotation.z += 0.05; // Fait tourner le curseur sur lui-même
+
+        // Mise à jour de l'affichage des sections HTML
+        updateHtmlSections();
+
+        composer.render();
+    }
+    animate();
+
+    // --- RESIZE ---
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // --- ANIMATION D'ENTRÉE DU TITRE ---
+    gsap.fromTo("#hero-main-title", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 2, ease: "power3.out" });
+    gsap.fromTo("#hero-subtitle", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 2.5, delay: 0.5, ease: "power3.out" });
+
+    // Initialisation de la première section (le titre)
+    currentSectionId = 'hero'; // Aucune section HTML n'est active au début
+
+  </script>
 </body>
 </html>
