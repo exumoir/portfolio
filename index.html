@@ -2,16 +2,19 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QUANTUM.DEV | Dimensional Architect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>NEXUS∞ | Dimensional Architect</title>
   
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@300;500;700&family=Michroma&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@300;500;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
     
     :root {
@@ -19,16 +22,23 @@
       --neon-magenta: #ff00ff;
       --neon-yellow: #ffff00;
       --neon-green: #00ff00;
+      --neon-orange: #ff6600;
       --bg: #000000;
     }
     
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+    
     body {
-      margin: 0;
       background: var(--bg);
       color: #fff;
       font-family: 'Space Mono', monospace;
-      overflow-x: hidden;
       cursor: none;
+      touch-action: pan-y;
     }
     
     /* ===== CANVAS ===== */
@@ -39,9 +49,10 @@
       width: 100%;
       height: 100%;
       z-index: 1;
+      touch-action: none;
     }
     
-    /* ===== CURSOR ===== */
+    /* ===== CURSOR (Desktop only) ===== */
     #cursor {
       position: fixed;
       width: 30px;
@@ -52,12 +63,45 @@
       z-index: 10000;
       mix-blend-mode: difference;
       transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      opacity: 0;
+    }
+    
+    @media (hover: hover) {
+      #cursor { opacity: 1; }
+      body { cursor: none; }
+    }
+    
+    @media (hover: none) {
+      body { cursor: auto; }
     }
     
     #cursor.active {
       transform: scale(0.5);
       background: var(--neon-cyan);
       box-shadow: 0 0 30px var(--neon-cyan);
+    }
+    
+    /* ===== RIPPLE EFFECTS ===== */
+    .ripple {
+      position: fixed;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      animation: ripple 1s ease-out forwards;
+    }
+    
+    @keyframes ripple {
+      from {
+        width: 0;
+        height: 0;
+        opacity: 1;
+      }
+      to {
+        width: 400px;
+        height: 400px;
+        opacity: 0;
+      }
     }
     
     /* ===== VIGNETTE ===== */
@@ -72,33 +116,6 @@
       background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%);
     }
     
-    /* ===== GRAIN ===== */
-    .grain {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 3;
-      opacity: 0.05;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-      animation: grain 8s steps(10) infinite;
-    }
-    
-    @keyframes grain {
-      0%, 100% { transform: translate(0, 0); }
-      10% { transform: translate(-5%, -10%); }
-      20% { transform: translate(-15%, 5%); }
-      30% { transform: translate(7%, -25%); }
-      40% { transform: translate(-5%, 25%); }
-      50% { transform: translate(-15%, 10%); }
-      60% { transform: translate(15%, 0%); }
-      70% { transform: translate(0%, 15%); }
-      80% { transform: translate(3%, 35%); }
-      90% { transform: translate(-10%, 10%); }
-    }
-    
     /* ===== UI OVERLAY ===== */
     .ui-overlay {
       position: relative;
@@ -110,12 +127,106 @@
       pointer-events: auto;
     }
     
+    /* ===== MOBILE CONTROLS ===== */
+    .mobile-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+    }
+    
+    @media (hover: none) {
+      .mobile-controls { display: flex; }
+    }
+    
+    .control-btn {
+      width: 60px;
+      height: 60px;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--neon-cyan);
+      cursor: pointer;
+      transition: all 0.3s;
+      touch-action: manipulation;
+    }
+    
+    .control-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 0 30px var(--neon-cyan);
+    }
+    
+    .control-btn.active {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: 0 0 30px var(--neon-cyan);
+    }
+    
+    /* ===== UNIVERSE SELECTOR ===== */
+    .universe-selector {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+    
+    .universe-btn {
+      width: 50px;
+      height: 50px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .universe-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+    
+    .universe-btn.active {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px var(--neon-cyan);
+    }
+    
+    .universe-btn:nth-child(1)::before { background: var(--neon-cyan); }
+    .universe-btn:nth-child(2)::before { background: var(--neon-magenta); }
+    .universe-btn:nth-child(3)::before { background: var(--neon-yellow); }
+    .universe-btn:nth-child(4)::before { background: var(--neon-green); }
+    
+    .universe-btn:hover::before {
+      width: 40px;
+      height: 40px;
+    }
+    
     /* ===== HEADER ===== */
     header {
       position: fixed;
       top: 0;
       width: 100%;
-      padding: 30px 60px;
+      padding: 20px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -123,11 +234,17 @@
       background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
     }
     
+    @media (min-width: 768px) {
+      header {
+        padding: 30px 60px;
+      }
+    }
+    
     .logo {
-      font-family: 'Michroma', sans-serif;
-      font-size: 28px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(20px, 5vw, 28px);
       font-weight: 700;
-      letter-spacing: 4px;
+      letter-spacing: 3px;
       position: relative;
       background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
       -webkit-background-clip: text;
@@ -136,24 +253,77 @@
     }
     
     .logo::before {
-      content: 'QUANTUM.DEV';
+      content: 'NEXUS∞';
       position: absolute;
       top: 0;
       left: 0;
-      opacity: 0.3;
+      opacity: 0;
       animation: glitch 5s infinite;
     }
     
     @keyframes glitch {
       0%, 90%, 100% { transform: translate(0); opacity: 0; }
-      92% { transform: translate(-3px, 3px); opacity: 0.3; color: var(--neon-cyan); }
-      94% { transform: translate(3px, -3px); opacity: 0.3; color: var(--neon-magenta); }
-      96% { transform: translate(-3px, 3px); opacity: 0.3; color: var(--neon-cyan); }
+      92% { transform: translate(-2px, 2px); opacity: 0.3; }
+      94% { transform: translate(2px, -2px); opacity: 0.3; }
+    }
+    
+    /* ===== HAMBURGER MENU (Mobile) ===== */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      z-index: 101;
+    }
+    
+    @media (max-width: 768px) {
+      .menu-toggle { display: flex; }
+    }
+    
+    .menu-toggle span {
+      width: 30px;
+      height: 3px;
+      background: var(--neon-cyan);
+      transition: all 0.3s;
+    }
+    
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(8px, 8px);
+    }
+    
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(8px, -8px);
     }
     
     nav {
       display: flex;
-      gap: 50px;
+      gap: 40px;
+    }
+    
+    @media (max-width: 768px) {
+      nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 100px 30px;
+        gap: 30px;
+        transition: right 0.3s;
+        border-left: 1px solid var(--neon-cyan);
+      }
+      
+      nav.active {
+        right: 0;
+      }
     }
     
     nav a {
@@ -188,41 +358,25 @@
     
     /* ===== HERO ===== */
     .hero {
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
       position: relative;
+      padding: 0 20px;
     }
     
     .hero-tag {
       font-family: 'Rajdhani', sans-serif;
-      font-size: 16px;
-      letter-spacing: 10px;
+      font-size: clamp(12px, 3vw, 16px);
+      letter-spacing: clamp(3px, 2vw, 10px);
       text-transform: uppercase;
       color: var(--neon-cyan);
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       opacity: 0;
       animation: fadeInUp 1s 0.5s forwards;
-      position: relative;
-    }
-    
-    .hero-tag::before,
-    .hero-tag::after {
-      content: '///';
-      position: absolute;
-      color: var(--neon-magenta);
-      opacity: 0.5;
-    }
-    
-    .hero-tag::before {
-      left: -40px;
-    }
-    
-    .hero-tag::after {
-      right: -40px;
     }
     
     @keyframes fadeInUp {
@@ -231,12 +385,11 @@
     }
     
     .hero h1 {
-      font-family: 'Michroma', sans-serif;
-      font-size: clamp(4rem, 15vw, 12rem);
-      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(3rem, 15vw, 12rem);
+      font-weight: 900;
       line-height: 0.85;
-      margin-bottom: 40px;
-      position: relative;
+      margin-bottom: 30px;
       opacity: 0;
       animation: fadeInUp 1s 0.8s forwards;
     }
@@ -261,27 +414,29 @@
     
     .hero p {
       max-width: 700px;
-      font-size: 16px;
+      font-size: clamp(14px, 3vw, 16px);
       line-height: 1.8;
       color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 50px;
+      margin-bottom: 40px;
       opacity: 0;
       animation: fadeInUp 1s 1.2s forwards;
     }
     
     .cta-group {
       display: flex;
-      gap: 30px;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
       opacity: 0;
       animation: fadeInUp 1s 1.5s forwards;
     }
     
     .btn {
-      padding: 18px 45px;
+      padding: 15px 35px;
       font-family: 'Rajdhani', sans-serif;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       text-transform: uppercase;
       text-decoration: none;
       position: relative;
@@ -290,6 +445,7 @@
       cursor: pointer;
       border: none;
       background: transparent;
+      white-space: nowrap;
     }
     
     .btn-primary {
@@ -310,11 +466,13 @@
       z-index: -1;
     }
     
-    .btn-primary:hover::before {
+    .btn-primary:hover::before,
+    .btn-primary:active::before {
       left: 0;
     }
     
-    .btn-primary:hover {
+    .btn-primary:hover,
+    .btn-primary:active {
       color: #fff;
       box-shadow: 0 0 50px rgba(255, 0, 255, 0.7);
     }
@@ -336,11 +494,13 @@
       z-index: -1;
     }
     
-    .btn-secondary:hover::before {
+    .btn-secondary:hover::before,
+    .btn-secondary:active::before {
       left: 0;
     }
     
-    .btn-secondary:hover {
+    .btn-secondary:hover,
+    .btn-secondary:active {
       color: #000;
       box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
     }
@@ -348,12 +508,12 @@
     /* ===== STATS HUD ===== */
     .stats-hud {
       position: fixed;
-      bottom: 40px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 60px;
-      padding: 25px 50px;
+      gap: clamp(20px, 5vw, 60px);
+      padding: 15px 25px;
       background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(0, 255, 255, 0.3);
@@ -362,119 +522,102 @@
       font-family: 'Rajdhani', sans-serif;
     }
     
+    @media (min-width: 768px) {
+      .stats-hud {
+        padding: 25px 50px;
+      }
+    }
+    
     .stat-item {
       text-align: center;
     }
     
     .stat-value {
-      font-size: 36px;
+      font-size: clamp(24px, 5vw, 36px);
       font-weight: 700;
       color: var(--neon-cyan);
       text-shadow: 0 0 20px var(--neon-cyan);
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
     
     .stat-label {
-      font-size: 11px;
+      font-size: clamp(9px, 2vw, 11px);
       text-transform: uppercase;
       letter-spacing: 2px;
       color: rgba(255, 255, 255, 0.5);
     }
     
-    /* ===== SCROLL HINT ===== */
-    .scroll-hint {
-      position: absolute;
-      bottom: 50px;
+    /* ===== AUDIO VISUALIZER ===== */
+    .audio-visualizer {
+      position: fixed;
+      bottom: 100px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
+      gap: 3px;
+      height: 60px;
+      align-items: flex-end;
+      z-index: 100;
       opacity: 0;
-      animation: fadeInUp 1s 2s forwards, float 3s 2s ease-in-out infinite;
+      transition: opacity 0.3s;
     }
     
-    @keyframes float {
-      0%, 100% { transform: translate(-50%, 0); }
-      50% { transform: translate(-50%, -15px); }
+    .audio-visualizer.active {
+      opacity: 1;
     }
     
-    .scroll-hint span {
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    .scroll-line {
-      width: 2px;
-      height: 50px;
-      background: linear-gradient(to bottom, var(--neon-cyan), transparent);
-      position: relative;
-    }
-    
-    .scroll-line::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 8px;
-      height: 8px;
-      background: var(--neon-cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 15px var(--neon-cyan);
-      animation: scrollDot 2s infinite;
-    }
-    
-    @keyframes scrollDot {
-      0% { top: 0; opacity: 1; }
-      100% { top: 100%; opacity: 0; }
+    .audio-bar {
+      width: 4px;
+      background: linear-gradient(to top, var(--neon-cyan), var(--neon-magenta));
+      border-radius: 2px;
+      transition: height 0.1s;
     }
     
     /* ===== SECTIONS ===== */
     section {
       min-height: 100vh;
-      padding: 120px 60px;
+      padding: 100px 20px;
       position: relative;
+    }
+    
+    @media (min-width: 768px) {
+      section {
+        padding: 120px 60px;
+      }
     }
     
     .section-title {
-      font-family: 'Michroma', sans-serif;
-      font-size: clamp(3rem, 10vw, 7rem);
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 10vw, 7rem);
       font-weight: 700;
-      margin-bottom: 80px;
+      margin-bottom: 60px;
       background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      position: relative;
-    }
-    
-    .section-title::before {
-      content: '>';
-      position: absolute;
-      left: -50px;
-      color: var(--neon-cyan);
-      opacity: 0.5;
     }
     
     /* ===== PROJECTS GRID ===== */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-      gap: 40px;
-      margin-top: 80px;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+      gap: 30px;
+      margin-top: 60px;
     }
     
     .project-card {
       background: rgba(0, 255, 255, 0.02);
       border: 1px solid rgba(0, 255, 255, 0.2);
-      padding: 50px;
+      padding: 30px;
       position: relative;
       overflow: hidden;
       transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @media (min-width: 768px) {
+      .project-card {
+        padding: 50px;
+      }
     }
     
     .project-card::before {
@@ -490,63 +633,50 @@
       transition: opacity 0.5s;
     }
     
-    .project-card::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, transparent 0%, rgba(0, 255, 255, 0.1) 100%);
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-    
-    .project-card:hover {
-      transform: translateY(-15px) scale(1.02);
+    .project-card:hover,
+    .project-card:active {
+      transform: translateY(-10px) scale(1.02);
       box-shadow: 0 30px 80px rgba(0, 255, 255, 0.3);
     }
     
-    .project-card:hover::before {
-      opacity: 1;
-    }
-    
-    .project-card:hover::after {
+    .project-card:hover::before,
+    .project-card:active::before {
       opacity: 1;
     }
     
     .project-number {
       font-family: 'Rajdhani', sans-serif;
-      font-size: 14px;
+      font-size: 12px;
       color: var(--neon-magenta);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       letter-spacing: 2px;
     }
     
     .project-card h3 {
-      font-family: 'Michroma', sans-serif;
-      font-size: 28px;
-      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(20px, 4vw, 28px);
+      margin-bottom: 15px;
       color: var(--neon-cyan);
     }
     
     .project-card p {
       color: rgba(255, 255, 255, 0.7);
       line-height: 1.8;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      font-size: clamp(13px, 2vw, 15px);
     }
     
     .tech-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
     
     .tech-tag {
-      padding: 8px 18px;
+      padding: 6px 14px;
       background: rgba(0, 255, 255, 0.1);
       border: 1px solid var(--neon-cyan);
-      font-size: 11px;
+      font-size: 10px;
       color: var(--neon-cyan);
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -555,7 +685,8 @@
       transition: all 0.3s;
     }
     
-    .tech-tag:hover {
+    .tech-tag:hover,
+    .tech-tag:active {
       background: var(--neon-cyan);
       color: #000;
       box-shadow: 0 0 20px var(--neon-cyan);
@@ -579,8 +710,8 @@
     
     .loader-container {
       position: relative;
-      width: 150px;
-      height: 150px;
+      width: 120px;
+      height: 120px;
     }
     
     .loader-ring {
@@ -609,10 +740,10 @@
     }
     
     .loading-text {
-      margin-top: 40px;
+      margin-top: 30px;
       font-family: 'Rajdhani', sans-serif;
-      font-size: 14px;
-      letter-spacing: 5px;
+      font-size: clamp(12px, 3vw, 14px);
+      letter-spacing: 3px;
       color: var(--neon-cyan);
       text-transform: uppercase;
       animation: pulse 2s ease-in-out infinite;
@@ -624,35 +755,30 @@
     }
     
     .loading-progress {
-      margin-top: 20px;
+      margin-top: 15px;
       font-family: 'Space Mono', monospace;
-      font-size: 24px;
+      font-size: clamp(18px, 4vw, 24px);
       color: var(--neon-magenta);
     }
     
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      header {
-        padding: 20px;
-      }
-      
-      nav {
-        gap: 20px;
-      }
-      
-      .projects-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      section {
-        padding: 80px 20px;
-      }
-      
-      .stats-hud {
-        flex-direction: column;
-        gap: 20px;
-        bottom: 20px;
-      }
+    /* ===== FPS COUNTER ===== */
+    .fps-counter {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      color: var(--neon-green);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px;
+      border: 1px solid var(--neon-green);
+      border-radius: 5px;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .fps-counter.show {
+      display: block;
     }
   </style>
 </head>
@@ -665,26 +791,65 @@
       <div class="loader-ring"></div>
       <div class="loader-ring"></div>
     </div>
-    <div class="loading-text">Initializing Quantum Core</div>
+    <div class="loading-text">Initializing Quantum Matrix</div>
     <div class="loading-progress">0%</div>
   </div>
   
   <!-- CUSTOM CURSOR -->
   <div id="cursor"></div>
   
-  <!-- VIGNETTE & GRAIN -->
+  <!-- VIGNETTE -->
   <div class="vignette"></div>
-  <div class="grain"></div>
+  
+  <!-- FPS COUNTER -->
+  <div class="fps-counter">
+    <div>FPS: <span id="fps-value">60</span></div>
+    <div>Particles: <span id="particle-count">0</span></div>
+  </div>
   
   <!-- 3D CANVAS -->
   <canvas id="canvas3d"></canvas>
+  
+  <!-- MOBILE CONTROLS -->
+  <div class="mobile-controls">
+    <div class="control-btn" id="audio-toggle">🎵</div>
+    <div class="control-btn" id="gyro-toggle">📱</div>
+    <div class="control-btn" id="fps-toggle">⚡</div>
+  </div>
+  
+  <!-- UNIVERSE SELECTOR -->
+  <div class="universe-selector">
+    <div class="universe-btn active" data-universe="0"></div>
+    <div class="universe-btn" data-universe="1"></div>
+    <div class="universe-btn" data-universe="2"></div>
+    <div class="universe-btn" data-universe="3"></div>
+  </div>
+  
+  <!-- AUDIO VISUALIZER -->
+  <div class="audio-visualizer" id="audio-viz">
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+    <div class="audio-bar"></div>
+  </div>
   
   <!-- UI OVERLAY -->
   <div class="ui-overlay">
     
     <!-- HEADER -->
     <header>
-      <div class="logo">QUANTUM.DEV</div>
+      <div class="logo">NEXUS∞</div>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <nav>
         <a href="#home">HOME</a>
         <a href="#work">WORK</a>
@@ -698,37 +863,32 @@
       <div class="hero-tag">/// DIMENSIONAL ARCHITECT ///</div>
       <h1>
         <span class="line">BEYOND</span>
-        <span class="line">REALITY</span>
+        <span class="line">INFINITY</span>
       </h1>
       <p>
-        Architecte d'expériences immersives transcendant les frontières du possible.
-        Maîtrisant l'art du raymarching volumétrique, des flow fields quantiques,
-        et des distorsions d'espace-temps pour créer l'impossible.
+        Créateur d'univers interactifs transcendant les limites du réel.
+        Audio-réactif, gyroscope-driven, et multi-dimensionnel.
+        Touchez l'écran pour créer des ondes quantiques.
       </p>
       <div class="cta-group">
-        <button class="btn btn-primary">EXPLORER LA DIMENSION</button>
-        <button class="btn btn-secondary">VOIR MES CRÉATIONS</button>
-      </div>
-      
-      <div class="scroll-hint">
-        <span>SCROLL</span>
-        <div class="scroll-line"></div>
+        <button class="btn btn-primary">EXPLORER</button>
+        <button class="btn btn-secondary">PROJETS</button>
       </div>
     </section>
     
     <!-- STATS HUD -->
     <div class="stats-hud">
       <div class="stat-item">
-        <span class="stat-value">75+</span>
+        <span class="stat-value" id="projects-count">0</span>
         <span class="stat-label">Projets</span>
       </div>
       <div class="stat-item">
         <span class="stat-value">∞</span>
-        <span class="stat-label">Dimensions</span>
+        <span class="stat-label">Univers</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">100%</span>
-        <span class="stat-label">Quantique</span>
+        <span class="stat-value" id="fps-display">60</span>
+        <span class="stat-label">FPS</span>
       </div>
     </div>
     
@@ -740,97 +900,91 @@
         
         <div class="project-card">
           <div class="project-number">// 01</div>
-          <h3>VOID DIMENSION</h3>
+          <h3>QUANTUM PORTAL</h3>
           <p>
-            Portail interdimensionnel avec raymarching volumétrique temps réel.
-            Distorsions d'espace-temps, effets de lentille gravitationnelle,
-            et particules quantiques réagissant à l'audio.
+            Portail interdimensionnel avec raymarching volumétrique.
+            Réagit à l'audio, au gyroscope, et aux touches tactiles.
+            Distorsions d'espace-temps en temps réel.
           </p>
           <div class="tech-list">
             <span class="tech-tag">Raymarching</span>
-            <span class="tech-tag">GLSL</span>
-            <span class="tech-tag">Audio Reactive</span>
-            <span class="tech-tag">WebGL2</span>
+            <span class="tech-tag">Audio-Reactive</span>
+            <span class="tech-tag">Gyroscope</span>
           </div>
         </div>
         
         <div class="project-card">
           <div class="project-number">// 02</div>
-          <h3>QUANTUM NEXUS</h3>
+          <h3>FLOW NEXUS</h3>
           <p>
-            Système de particules avec flow fields et curl noise.
-            500K particules GPU-driven avec compute shaders,
-            simulation de fluides MLS-MPM en temps réel.
+            Système de particules adaptatif avec flow fields.
+            Performance optimisée mobile/desktop.
+            Touch gestures avancés avec ripple effects.
           </p>
           <div class="tech-list">
-            <span class="tech-tag">Compute Shaders</span>
             <span class="tech-tag">Flow Fields</span>
-            <span class="tech-tag">Three.js</span>
-            <span class="tech-tag">MLS-MPM</span>
+            <span class="tech-tag">Mobile First</span>
+            <span class="tech-tag">Touch Events</span>
           </div>
         </div>
         
         <div class="project-card">
           <div class="project-number">// 03</div>
-          <h3>NEURAL SPACE</h3>
+          <h3>SOUND DIMENSION</h3>
           <p>
-            Interface IA générative avec visualisation de données neuronales.
-            Path tracing pour éclairage photoréaliste,
-            rendu volumétrique de nuages procéduraux.
+            Visualisation audio 3D avec analyse de fréquences.
+            Réagit au micro ou à la musique.
+            10 bandes de fréquences visualisées.
           </p>
           <div class="tech-list">
-            <span class="tech-tag">Path Tracing</span>
-            <span class="tech-tag">TensorFlow.js</span>
-            <span class="tech-tag">React</span>
-            <span class="tech-tag">WebGPU</span>
+            <span class="tech-tag">Web Audio API</span>
+            <span class="tech-tag">FFT Analysis</span>
+            <span class="tech-tag">Real-time</span>
           </div>
         </div>
         
         <div class="project-card">
           <div class="project-number">// 04</div>
-          <h3>COSMIC FLUX</h3>
+          <h3>MULTI-VERSE</h3>
           <p>
-            Expérience narrative immersive combinant audio spatial 3D,
-            effets holographiques avancés, et transitions
-            fluides entre dimensions parallèles.
+            Transitions fluides entre 4 univers différents.
+            Chaque univers avec sa propre physique et esthétique.
+            Navigation intuitive par swipe ou click.
           </p>
           <div class="tech-list">
-            <span class="tech-tag">Spatial Audio</span>
-            <span class="tech-tag">GSAP</span>
-            <span class="tech-tag">Tone.js</span>
-            <span class="tech-tag">Custom Shaders</span>
+            <span class="tech-tag">Scene Transitions</span>
+            <span class="tech-tag">Swipe Gestures</span>
+            <span class="tech-tag">Dynamic Physics</span>
           </div>
         </div>
         
         <div class="project-card">
           <div class="project-number">// 05</div>
-          <h3>HYPER MATRIX</h3>
+          <h3>GYRO SPACE</h3>
           <p>
-            Dashboard temps réel avec métriques GPU-accelerated.
-            Graphiques 3D volumétriques, effets de bloom HDR,
-            et système de particules réactif aux données.
+            Expérience immersive pilotée par gyroscope.
+            Orientation du device contrôle la caméra 3D.
+            Effet parallaxe avancé sur mobile.
           </p>
           <div class="tech-list">
-            <span class="tech-tag">WebGL2</span>
-            <span class="tech-tag">D3.js</span>
-            <span class="tech-tag">HDR Rendering</span>
-            <span class="tech-tag">Post-FX</span>
+            <span class="tech-tag">Device Orientation</span>
+            <span class="tech-tag">Parallax</span>
+            <span class="tech-tag">Mobile VR</span>
           </div>
         </div>
         
         <div class="project-card">
           <div class="project-number">// 06</div>
-          <h3>FRACTAL DREAMS</h3>
+          <h3>ADAPTIVE ENGINE</h3>
           <p>
-            Exploration interactive de fractales 4D avec mandelbulb raymarching.
-            Génération procédurale infinie, zoom illimité,
-            et couleurs psychédéliques audio-réactives.
+            Moteur de rendu adaptatif auto-optimisé.
+            Détection automatique mobile/desktop.
+            Ajustement dynamique des performances.
           </p>
           <div class="tech-list">
-            <span class="tech-tag">Mandelbulb</span>
-            <span class="tech-tag">4D Math</span>
-            <span class="tech-tag">Procedural</span>
-            <span class="tech-tag">Infinite Zoom</span>
+            <span class="tech-tag">Auto-Optimization</span>
+            <span class="tech-tag">Performance</span>
+            <span class="tech-tag">Adaptive Rendering</span>
           </div>
         </div>
         
@@ -855,245 +1009,41 @@
     import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
     import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
     import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-    import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
     
     // ===================================
-    // CUSTOM SHADERS - ADVANCED 2025
+    // DEVICE & PERFORMANCE DETECTION
     // ===================================
     
-    // Volumetric Raymarching Shader for Dimensional Portal
-    const PortalShader = {
-      uniforms: {
-        time: { value: 0 },
-        resolution: { value: new THREE.Vector2() },
-        mouse: { value: new THREE.Vector2() }
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float time;
-        uniform vec2 resolution;
-        uniform vec2 mouse;
-        varying vec2 vUv;
-        
-        #define MAX_STEPS 100
-        #define MAX_DIST 100.0
-        #define SURF_DIST 0.001
-        
-        // Noise functions
-        vec3 hash3(vec3 p) {
-          p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
-                   dot(p, vec3(269.5, 183.3, 246.1)),
-                   dot(p, vec3(113.5, 271.9, 124.6)));
-          return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
-        }
-        
-        float noise(vec3 p) {
-          vec3 i = floor(p);
-          vec3 f = fract(p);
-          f = f * f * (3.0 - 2.0 * f);
-          
-          return mix(
-            mix(mix(dot(hash3(i + vec3(0, 0, 0)), f - vec3(0, 0, 0)),
-                    dot(hash3(i + vec3(1, 0, 0)), f - vec3(1, 0, 0)), f.x),
-                mix(dot(hash3(i + vec3(0, 1, 0)), f - vec3(0, 1, 0)),
-                    dot(hash3(i + vec3(1, 1, 0)), f - vec3(1, 1, 0)), f.x), f.y),
-            mix(mix(dot(hash3(i + vec3(0, 0, 1)), f - vec3(0, 0, 1)),
-                    dot(hash3(i + vec3(1, 0, 1)), f - vec3(1, 0, 1)), f.x),
-                mix(dot(hash3(i + vec3(0, 1, 1)), f - vec3(0, 1, 1)),
-                    dot(hash3(i + vec3(1, 1, 1)), f - vec3(1, 1, 1)), f.x), f.y), f.z
-          );
-        }
-        
-        float fbm(vec3 p) {
-          float value = 0.0;
-          float amplitude = 0.5;
-          float frequency = 1.0;
-          
-          for(int i = 0; i < 6; i++) {
-            value += amplitude * noise(p * frequency);
-            frequency *= 2.0;
-            amplitude *= 0.5;
-          }
-          
-          return value;
-        }
-        
-        // SDF for portal torus
-        float sdTorus(vec3 p, vec2 t) {
-          vec2 q = vec2(length(p.xz) - t.x, p.y);
-          return length(q) - t.y;
-        }
-        
-        // Volumetric density function
-        float getDensity(vec3 p) {
-          float dist = sdTorus(p, vec2(3.0, 0.8));
-          
-          // Add turbulence
-          float turbulence = fbm(p * 2.0 + time * 0.3);
-          
-          // Create volumetric effect
-          float density = -dist + turbulence * 0.5;
-          
-          // Add swirling effect
-          float angle = atan(p.z, p.x) + time * 0.5;
-          density += sin(angle * 5.0 + time) * 0.2;
-          
-          return density;
-        }
-        
-        // Volumetric raymarching
-        vec4 raymarch(vec3 ro, vec3 rd) {
-          float depth = 0.0;
-          vec4 color = vec4(0.0);
-          
-          for(int i = 0; i < MAX_STEPS; i++) {
-            vec3 p = ro + rd * depth;
-            
-            float density = getDensity(p);
-            
-            if(density > 0.0) {
-              // Color based on depth and density
-              vec3 col = vec3(0.0, 1.0, 1.0) * density; // Cyan
-              col += vec3(1.0, 0.0, 1.0) * (1.0 - density * 0.5); // Magenta
-              
-              // Add glow based on distance to center
-              float glow = 1.0 - smoothstep(0.0, 4.0, length(p));
-              col += glow * vec3(1.0, 1.0, 0.0) * 0.5; // Yellow glow
-              
-              // Accumulate color
-              float alpha = density * 0.1;
-              color.rgb += col * alpha * (1.0 - color.a);
-              color.a += alpha;
-              
-              if(color.a > 0.95) break;
-            }
-            
-            depth += 0.05; // Fixed step size for volumetric
-            
-            if(depth > MAX_DIST) break;
-          }
-          
-          return color;
-        }
-        
-        void main() {
-          vec2 uv = (vUv - 0.5) * 2.0;
-          uv.x *= resolution.x / resolution.y;
-          
-          // Camera setup
-          vec3 ro = vec3(0.0, 0.0, 8.0);
-          vec3 rd = normalize(vec3(uv, -1.0));
-          
-          // Rotate camera based on mouse
-          float mx = mouse.x * 6.28;
-          float my = mouse.y * 3.14;
-          mat2 rotX = mat2(cos(mx), -sin(mx), sin(mx), cos(mx));
-          mat2 rotY = mat2(cos(my), -sin(my), sin(my), cos(my));
-          ro.xz *= rotX;
-          rd.xz *= rotX;
-          ro.yz *= rotY;
-          rd.yz *= rotY;
-          
-          // Raymarch
-          vec4 color = raymarch(ro, rd);
-          
-          // Add background stars
-          if(color.a < 1.0) {
-            float stars = smoothstep(0.99, 1.0, noise(rd * 100.0));
-            color.rgb += stars * vec3(1.0) * (1.0 - color.a);
-          }
-          
-          gl_FragColor = vec4(color.rgb, 1.0);
-        }
-      `
-    };
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTouch = 'ontouchstart' in window;
     
-    // Flow Field Shader
-    const FlowFieldShader = {
-      uniforms: {
-        tDiffuse: { value: null },
-        time: { value: 0 },
-        intensity: { value: 0.3 }
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    let performanceMode = 'high'; // high, medium, low
+    let particleCount = isMobile ? 3000 : 10000;
+    let bloomStrength = isMobile ? 1.2 : 2.0;
+    
+    // Auto-detect performance
+    const canvas = document.getElementById('canvas3d');
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    if (gl) {
+      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        if (renderer.includes('Intel') || renderer.includes('AMD')) {
+          performanceMode = isMobile ? 'low' : 'medium';
+          particleCount = isMobile ? 1000 : 5000;
+          bloomStrength = isMobile ? 0.8 : 1.5;
         }
-      `,
-      fragmentShader: `
-        uniform sampler2D tDiffuse;
-        uniform float time;
-        uniform float intensity;
-        varying vec2 vUv;
-        
-        vec3 hash3(vec3 p) {
-          p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
-                   dot(p, vec3(269.5, 183.3, 246.1)),
-                   dot(p, vec3(113.5, 271.9, 124.6)));
-          return fract(sin(p) * 43758.5453123);
-        }
-        
-        // Curl noise for flow field
-        vec3 curlNoise(vec3 p) {
-          const float e = 0.1;
-          vec3 dx = vec3(e, 0.0, 0.0);
-          vec3 dy = vec3(0.0, e, 0.0);
-          vec3 dz = vec3(0.0, 0.0, e);
-          
-          vec3 p_x0 = hash3(p - dx);
-          vec3 p_x1 = hash3(p + dx);
-          vec3 p_y0 = hash3(p - dy);
-          vec3 p_y1 = hash3(p + dy);
-          vec3 p_z0 = hash3(p - dz);
-          vec3 p_z1 = hash3(p + dz);
-          
-          float x = p_y1.z - p_y0.z - p_z1.y + p_z0.y;
-          float y = p_z1.x - p_z0.x - p_x1.z + p_x0.z;
-          float z = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
-          
-          return normalize(vec3(x, y, z));
-        }
-        
-        void main() {
-          vec2 uv = vUv;
-          
-          // Apply flow field distortion
-          vec3 flowPos = vec3(uv * 3.0, time * 0.2);
-          vec3 flow = curlNoise(flowPos);
-          
-          vec2 distortion = flow.xy * intensity * 0.02;
-          uv += distortion;
-          
-          vec4 color = texture2D(tDiffuse, uv);
-          
-          // Add chromatic aberration
-          float aberration = 0.002;
-          float r = texture2D(tDiffuse, uv + vec2(aberration, 0.0)).r;
-          float g = texture2D(tDiffuse, uv).g;
-          float b = texture2D(tDiffuse, uv - vec2(aberration, 0.0)).b;
-          
-          color = vec4(r, g, b, color.a);
-          
-          gl_FragColor = color;
-        }
-      `
-    };
+      }
+    }
+    
+    console.log(`🚀 Device: ${isMobile ? 'Mobile' : 'Desktop'} | Performance: ${performanceMode} | Particles: ${particleCount}`);
     
     // ===================================
     // SCENE SETUP
     // ===================================
     
-    const canvas = document.getElementById('canvas3d');
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x000000, 0.015);
+    scene.fog = new THREE.FogExp2(0x000000, isMobile ? 0.02 : 0.015);
     
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -1101,79 +1051,113 @@
       0.1,
       1000
     );
-    camera.position.z = 20;
+    camera.position.z = isMobile ? 15 : 20;
     
     const renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: true,
-      alpha: true
+      antialias: !isMobile,
+      alpha: true,
+      powerPreference: 'high-performance'
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.5;
     
     // ===================================
-    // DIMENSIONAL PORTAL
+    // UNIVERSES SYSTEM
     // ===================================
     
-    const portalGeometry = new THREE.PlaneGeometry(20, 20);
-    const portalMaterial = new THREE.ShaderMaterial({
-      uniforms: PortalShader.uniforms,
-      vertexShader: PortalShader.vertexShader,
-      fragmentShader: PortalShader.fragmentShader,
-      transparent: true,
-      side: THREE.DoubleSide
-    });
+    let currentUniverse = 0;
+    const universes = [];
     
-    const portal = new THREE.Mesh(portalGeometry, portalMaterial);
-    scene.add(portal);
+    // Universe 1: Cyan Portal
+    const universe1 = {
+      color: new THREE.Color(0x00ffff),
+      particleColors: [
+        new THREE.Color(0x00ffff),
+        new THREE.Color(0xff00ff),
+        new THREE.Color(0xffff00)
+      ],
+      fogDensity: 0.015,
+      rotationSpeed: 0.001
+    };
     
-    // Update resolution
-    portalMaterial.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+    // Universe 2: Magenta Vortex
+    const universe2 = {
+      color: new THREE.Color(0xff00ff),
+      particleColors: [
+        new THREE.Color(0xff00ff),
+        new THREE.Color(0xff0066),
+        new THREE.Color(0xffbb00)
+      ],
+      fogDensity: 0.02,
+      rotationSpeed: 0.002
+    };
+    
+    // Universe 3: Yellow Energy
+    const universe3 = {
+      color: new THREE.Color(0xffff00),
+      particleColors: [
+        new THREE.Color(0xffff00),
+        new THREE.Color(0xff6600),
+        new THREE.Color(0x00ff00)
+      ],
+      fogDensity: 0.01,
+      rotationSpeed: 0.0015
+    };
+    
+    // Universe 4: Green Matrix
+    const universe4 = {
+      color: new THREE.Color(0x00ff00),
+      particleColors: [
+        new THREE.Color(0x00ff00),
+        new THREE.Color(0x00ffff),
+        new THREE.Color(0xffffff)
+      ],
+      fogDensity: 0.025,
+      rotationSpeed: 0.0008
+    };
+    
+    universes.push(universe1, universe2, universe3, universe4);
     
     // ===================================
-    // FLOW FIELD PARTICLES
+    // PARTICLES SYSTEM
     // ===================================
     
-    const particleCount = 10000;
     const positions = new Float32Array(particleCount * 3);
     const velocities = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
     
-    const colorPalette = [
-      new THREE.Color(0x00ffff), // Cyan
-      new THREE.Color(0xff00ff), // Magenta
-      new THREE.Color(0xffff00), // Yellow
-      new THREE.Color(0x00ff00)  // Green
-    ];
-    
-    for (let i = 0; i < particleCount; i++) {
-      const i3 = i * 3;
+    function initParticles() {
+      const currentColors = universes[currentUniverse].particleColors;
       
-      // Random position in sphere
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const radius = 15 + Math.random() * 10;
-      
-      positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i3 + 2] = radius * Math.cos(phi);
-      
-      // Random velocity
-      velocities[i3] = (Math.random() - 0.5) * 0.02;
-      velocities[i3 + 1] = (Math.random() - 0.5) * 0.02;
-      velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
-      
-      // Random color
-      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-      colors[i3] = color.r;
-      colors[i3 + 1] = color.g;
-      colors[i3 + 2] = color.b;
-      
-      sizes[i] = Math.random() * 3 + 1;
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const radius = 10 + Math.random() * 15;
+        
+        positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        positions[i3 + 2] = radius * Math.cos(phi);
+        
+        velocities[i3] = (Math.random() - 0.5) * 0.02;
+        velocities[i3 + 1] = (Math.random() - 0.5) * 0.02;
+        velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
+        
+        const color = currentColors[Math.floor(Math.random() * currentColors.length)];
+        colors[i3] = color.r;
+        colors[i3 + 1] = color.g;
+        colors[i3 + 2] = color.b;
+        
+        sizes[i] = Math.random() * 3 + 1;
+      }
     }
+    
+    initParticles();
     
     const particleGeometry = new THREE.BufferGeometry();
     particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -1183,19 +1167,21 @@
     const particleMaterial = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0 },
-        pixelRatio: { value: renderer.getPixelRatio() }
+        pixelRatio: { value: renderer.getPixelRatio() },
+        audioBoost: { value: 1.0 }
       },
       vertexShader: `
         attribute float size;
         varying vec3 vColor;
         uniform float time;
         uniform float pixelRatio;
+        uniform float audioBoost;
         
         void main() {
           vColor = color;
           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
           
-          float pulse = 1.0 + 0.5 * sin(time * 3.0 + position.x * 0.1);
+          float pulse = 1.0 + 0.5 * sin(time * 3.0 + position.x * 0.1) * audioBoost;
           
           gl_PointSize = size * pulse * pixelRatio * (400.0 / -mvPosition.z);
           gl_Position = projectionMatrix * mvPosition;
@@ -1211,7 +1197,6 @@
           if (dist > 0.5) discard;
           
           float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
-          
           vec3 glow = vColor * (1.0 + 1.5 * (1.0 - dist * 2.0));
           
           gl_FragColor = vec4(glow, alpha);
@@ -1227,106 +1212,269 @@
     scene.add(particles);
     
     // ===================================
-    // GEOMETRIC SHAPES - WIREFRAME GRID
-    // ===================================
-    
-    const gridCount = 8;
-    const grids = [];
-    
-    for (let i = 0; i < gridCount; i++) {
-      const geometry = new THREE.IcosahedronGeometry(5 + i * 3, 0);
-      const material = new THREE.MeshBasicMaterial({
-        color: colorPalette[i % colorPalette.length],
-        wireframe: true,
-        transparent: true,
-        opacity: 0.15
-      });
-      
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.position.z = -i * 8;
-      
-      grids.push({
-        mesh,
-        rotationSpeed: 0.001 + Math.random() * 0.002
-      });
-      
-      scene.add(mesh);
-    }
-    
-    // ===================================
     // POST-PROCESSING
     // ===================================
     
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     
-    // Bloom
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      2.0,  // strength
-      0.6,  // radius
-      0.3   // threshold
+      bloomStrength,
+      0.6,
+      0.3
     );
     composer.addPass(bloomPass);
     
-    // Film grain
-    const filmPass = new FilmPass(0.2, 0.5, 2048, false);
-    composer.addPass(filmPass);
+    // ===================================
+    // AUDIO SYSTEM
+    // ===================================
     
-    // Flow field distortion
-    const flowPass = new ShaderPass(FlowFieldShader);
-    composer.addPass(flowPass);
+    let audioContext, analyser, dataArray, audioSource;
+    let isAudioActive = false;
+    
+    async function initAudio() {
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 32;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        audioSource = audioContext.createMediaStreamSource(stream);
+        audioSource.connect(analyser);
+        
+        isAudioActive = true;
+        document.getElementById('audio-viz').classList.add('active');
+        console.log('🎵 Audio activated!');
+      } catch (err) {
+        console.log('Audio not available:', err);
+      }
+    }
     
     // ===================================
-    // MOUSE INTERACTION
+    // GYROSCOPE SYSTEM
+    // ===================================
+    
+    let isGyroActive = false;
+    let gyroRotation = { x: 0, y: 0, z: 0 };
+    
+    async function initGyro() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          const permission = await DeviceOrientationEvent.requestPermission();
+          if (permission === 'granted') {
+            window.addEventListener('deviceorientation', handleOrientation);
+            isGyroActive = true;
+            console.log('📱 Gyroscope activated!');
+          }
+        } catch (err) {
+          console.log('Gyroscope permission denied');
+        }
+      } else if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', handleOrientation);
+        isGyroActive = true;
+        console.log('📱 Gyroscope activated!');
+      }
+    }
+    
+    function handleOrientation(event) {
+      if (!isGyroActive) return;
+      
+      gyroRotation.x = event.beta ? event.beta * (Math.PI / 180) : 0;
+      gyroRotation.y = event.gamma ? event.gamma * (Math.PI / 180) : 0;
+      gyroRotation.z = event.alpha ? event.alpha * (Math.PI / 180) : 0;
+    }
+    
+    // ===================================
+    // TOUCH & MOUSE INTERACTIONS
     // ===================================
     
     const mouse = { x: 0, y: 0 };
     const targetMouse = { x: 0, y: 0 };
     
-    document.addEventListener('mousemove', (e) => {
+    function createRipple(x, y) {
+      const ripple = document.createElement('div');
+      ripple.className = 'ripple';
+      ripple.style.left = (x - 200) + 'px';
+      ripple.style.top = (y - 200) + 'px';
+      document.body.appendChild(ripple);
+      
+      setTimeout(() => ripple.remove(), 1000);
+    }
+    
+    // Mouse events
+    canvas.addEventListener('mousemove', (e) => {
       targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      
-      // Update portal shader
-      portalMaterial.uniforms.mouse.value.x = targetMouse.x * 0.5 + 0.5;
-      portalMaterial.uniforms.mouse.value.y = targetMouse.y * 0.5 + 0.5;
+    });
+    
+    canvas.addEventListener('click', (e) => {
+      createRipple(e.clientX, e.clientY);
+    });
+    
+    // Touch events
+    canvas.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      targetMouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+      targetMouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+      createRipple(touch.clientX, touch.clientY);
+    });
+    
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      targetMouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+      targetMouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
     });
     
     // ===================================
     // CURSOR
     // ===================================
     
-    const cursor = document.getElementById('cursor');
-    let cursorX = 0, cursorY = 0;
-    
-    document.addEventListener('mousemove', (e) => {
-      cursorX = e.clientX;
-      cursorY = e.clientY;
-    });
-    
-    document.addEventListener('mousedown', () => {
-      cursor.classList.add('active');
-    });
-    
-    document.addEventListener('mouseup', () => {
-      cursor.classList.remove('active');
-    });
-    
-    function updateCursor() {
-      cursor.style.left = cursorX + 'px';
-      cursor.style.top = cursorY + 'px';
-      requestAnimationFrame(updateCursor);
+    if (!isMobile) {
+      const cursor = document.getElementById('cursor');
+      let cursorX = 0, cursorY = 0;
+      
+      document.addEventListener('mousemove', (e) => {
+        cursorX = e.clientX;
+        cursorY = e.clientY;
+      });
+      
+      document.addEventListener('mousedown', () => {
+        cursor.classList.add('active');
+      });
+      
+      document.addEventListener('mouseup', () => {
+        cursor.classList.remove('active');
+      });
+      
+      function updateCursor() {
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+        requestAnimationFrame(updateCursor);
+      }
+      updateCursor();
     }
-    updateCursor();
     
     // ===================================
-    // ANIMATION LOOP
+    // UI CONTROLS
     // ===================================
     
-    const clock = new THREE.Clock();
+    // Mobile menu toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('nav');
     
-    // Curl noise function for particles
+    menuToggle?.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      nav.classList.toggle('active');
+    });
+    
+    // Close menu on link click
+    document.querySelectorAll('nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle?.classList.remove('active');
+        nav?.classList.remove('active');
+      });
+    });
+    
+    // Audio toggle
+    const audioToggle = document.getElementById('audio-toggle');
+    audioToggle?.addEventListener('click', async () => {
+      if (!isAudioActive) {
+        await initAudio();
+        audioToggle.classList.add('active');
+      } else {
+        if (audioContext) audioContext.close();
+        isAudioActive = false;
+        audioToggle.classList.remove('active');
+        document.getElementById('audio-viz').classList.remove('active');
+      }
+    });
+    
+    // Gyro toggle
+    const gyroToggle = document.getElementById('gyro-toggle');
+    gyroToggle?.addEventListener('click', async () => {
+      if (!isGyroActive) {
+        await initGyro();
+        gyroToggle.classList.add('active');
+      } else {
+        window.removeEventListener('deviceorientation', handleOrientation);
+        isGyroActive = false;
+        gyroToggle.classList.remove('active');
+      }
+    });
+    
+    // FPS toggle
+    const fpsToggle = document.getElementById('fps-toggle');
+    const fpsCounter = document.querySelector('.fps-counter');
+    fpsToggle?.addEventListener('click', () => {
+      fpsCounter.classList.toggle('show');
+      fpsToggle.classList.toggle('active');
+    });
+    
+    // Universe selector
+    document.querySelectorAll('.universe-btn').forEach((btn, index) => {
+      btn.addEventListener('click', () => {
+        currentUniverse = index;
+        
+        document.querySelectorAll('.universe-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Transition to new universe
+        transitionUniverse();
+      });
+    });
+    
+    function transitionUniverse() {
+      const universe = universes[currentUniverse];
+      
+      // Update fog
+      scene.fog.density = universe.fogDensity;
+      
+      // Update particle colors
+      const currentColors = universe.particleColors;
+      const colors = particleGeometry.attributes.color.array;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const color = currentColors[Math.floor(Math.random() * currentColors.length)];
+        colors[i3] = color.r;
+        colors[i3 + 1] = color.g;
+        colors[i3 + 2] = color.b;
+      }
+      
+      particleGeometry.attributes.color.needsUpdate = true;
+      
+      console.log(`🌌 Switched to Universe ${currentUniverse + 1}`);
+    }
+    
+    // ===================================
+    // FPS COUNTER
+    // ===================================
+    
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let fps = 60;
+    
+    function updateFPS() {
+      frameCount++;
+      const currentTime = performance.now();
+      
+      if (currentTime >= lastTime + 1000) {
+        fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
+        frameCount = 0;
+        lastTime = currentTime;
+        
+        document.getElementById('fps-value').textContent = fps;
+        document.getElementById('fps-display').textContent = fps;
+      }
+    }
+    
+    // ===================================
+    // CURL NOISE FUNCTION
+    // ===================================
+    
     function curlNoise(x, y, z, t) {
       const n1 = Math.sin(x * 2 + t) * Math.cos(y * 2);
       const n2 = Math.cos(x * 2) * Math.sin(z * 2 + t);
@@ -1339,25 +1487,44 @@
       };
     }
     
+    // ===================================
+    // ANIMATION LOOP
+    // ===================================
+    
+    const clock = new THREE.Clock();
+    
     function animate() {
       requestAnimationFrame(animate);
       
       const elapsedTime = clock.getElapsedTime();
+      updateFPS();
       
-      // Update shader uniforms
-      portalMaterial.uniforms.time.value = elapsedTime;
+      // Update audio visualizer
+      let audioBoost = 1.0;
+      if (isAudioActive && analyser) {
+        analyser.getByteFrequencyData(dataArray);
+        
+        const audioBars = document.querySelectorAll('.audio-bar');
+        audioBars.forEach((bar, i) => {
+          const value = dataArray[i] || 0;
+          const height = (value / 255) * 60;
+          bar.style.height = height + 'px';
+        });
+        
+        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        audioBoost = 1.0 + (avg / 255) * 2.0;
+      }
+      
       particleMaterial.uniforms.time.value = elapsedTime;
-      flowPass.uniforms.time.value = elapsedTime;
+      particleMaterial.uniforms.audioBoost.value = audioBoost;
       
-      // Smooth mouse following
+      // Smooth mouse
       mouse.x += (targetMouse.x - mouse.x) * 0.05;
       mouse.y += (targetMouse.y - mouse.y) * 0.05;
       
-      // Rotate portal
-      portal.rotation.z = elapsedTime * 0.1;
-      
-      // Update particles with flow field
+      // Update particles
       const positions = particleGeometry.attributes.position.array;
+      const universe = universes[currentUniverse];
       
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
@@ -1366,19 +1533,16 @@
         const y = positions[i3 + 1];
         const z = positions[i3 + 2];
         
-        // Apply curl noise flow field
         const flow = curlNoise(x * 0.1, y * 0.1, z * 0.1, elapsedTime * 0.5);
         
         velocities[i3] += flow.x * 0.001;
         velocities[i3 + 1] += flow.y * 0.001;
         velocities[i3 + 2] += flow.z * 0.001;
         
-        // Apply velocity
         positions[i3] += velocities[i3];
         positions[i3 + 1] += velocities[i3 + 1];
         positions[i3 + 2] += velocities[i3 + 2];
         
-        // Attraction to center
         const dist = Math.sqrt(x * x + y * y + z * z);
         if (dist > 30) {
           positions[i3] *= 0.99;
@@ -1386,7 +1550,6 @@
           positions[i3 + 2] *= 0.99;
         }
         
-        // Damping
         velocities[i3] *= 0.99;
         velocities[i3 + 1] *= 0.99;
         velocities[i3 + 2] *= 0.99;
@@ -1394,29 +1557,19 @@
       
       particleGeometry.attributes.position.needsUpdate = true;
       
-      // Rotate grids
-      grids.forEach((grid, index) => {
-        grid.mesh.rotation.x += grid.rotationSpeed;
-        grid.mesh.rotation.y += grid.rotationSpeed * 0.7;
-        
-        // Move grids forward
-        grid.mesh.position.z += 0.05;
-        
-        if (grid.mesh.position.z > 20) {
-          grid.mesh.position.z = -(gridCount - 1) * 8;
-        }
-        
-        // Pulsate
-        const scale = 1 + Math.sin(elapsedTime * 2 + index) * 0.1;
-        grid.mesh.scale.set(scale, scale, scale);
-      });
+      // Rotation
+      particles.rotation.y += universe.rotationSpeed;
       
-      // Camera movement
-      camera.position.x = mouse.x * 3;
-      camera.position.y = mouse.y * 3;
-      camera.lookAt(scene.position);
+      // Camera control
+      if (isGyroActive) {
+        camera.rotation.x = gyroRotation.x * 0.3;
+        camera.rotation.y = gyroRotation.y * 0.3;
+      } else {
+        camera.position.x += (mouse.x * 5 - camera.position.x) * 0.05;
+        camera.position.y += (mouse.y * 5 - camera.position.y) * 0.05;
+        camera.lookAt(scene.position);
+      }
       
-      // Render
       composer.render();
     }
     
@@ -1430,17 +1583,17 @@
       
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
-      
-      portalMaterial.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
     });
     
     // ===================================
-    // LOADING SIMULATION
+    // LOADING & START
     // ===================================
     
     const loadingEl = document.getElementById('loading');
     const progressEl = document.querySelector('.loading-progress');
+    const projectsCount = document.getElementById('projects-count');
     let progress = 0;
+    let count = 0;
     
     const loadingInterval = setInterval(() => {
       progress += Math.random() * 15;
@@ -1457,10 +1610,20 @@
           setTimeout(() => {
             loadingEl.style.display = 'none';
             animate();
+            
+            // Animate project count
+            const countInterval = setInterval(() => {
+              count++;
+              projectsCount.textContent = count;
+              if (count >= 75) clearInterval(countInterval);
+            }, 30);
           }, 800);
         }, 500);
       }
     }, 100);
+    
+    // Update particle count
+    document.getElementById('particle-count').textContent = particleCount;
     
     // ===================================
     // SMOOTH SCROLL
