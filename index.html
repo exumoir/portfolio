@@ -1,200 +1,1482 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CORE.IX | MOBILE OVERDRIVE</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUANTUM.DEV | Dimensional Architect</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@300;500;700&family=Michroma&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root { --neon: #00f2ff; --dark: #000000; }
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: var(--dark); color: white;
-            font-family: 'Space Grotesk', sans-serif; overflow: hidden;
-            touch-action: none; /* Empêche le scroll natif pour laisser la 3D gérer */
-        }
-
-        #webgl-canvas { position: fixed; top: 0; left: 0; outline: none; z-index: 1; }
-
-        /* INTERFACE MOBILE */
-        #interface {
-            position: fixed; inset: 0; z-index: 10;
-            pointer-events: none; display: flex; flex-direction: column;
-        }
-
-        .navbar { pointer-events: auto; padding: 1rem; }
-        .nav-link { 
-            font-family: 'Syncopate'; font-size: 0.6rem; 
-            letter-spacing: 1px; color: var(--neon) !important;
-        }
-
-        .section-content {
-            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; opacity: 0; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            pointer-events: none; text-align: center;
-        }
-        .section-content.visible { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
-
-        .glitch-title {
-            font-family: 'Syncopate'; font-size: 12vw; font-weight: 700;
-            background: linear-gradient(to bottom, #fff, var(--neon));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0,242,255,0.5);
-        }
-
-        #init-btn {
-            position: fixed; bottom: 15%; left: 50%; transform: translateX(-50%);
-            padding: 12px 30px; border: 1px solid var(--neon);
-            background: rgba(0,242,255,0.05); color: var(--neon);
-            font-family: 'Syncopate'; font-size: 0.7rem; z-index: 100;
-            pointer-events: auto; backdrop-filter: blur(5px);
-        }
-    </style>
-
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
-                "gsap": "https://cdn.skypack.dev/gsap"
-            }
-        }
-    </script>
+    :root {
+      --neon-cyan: #00ffff;
+      --neon-magenta: #ff00ff;
+      --neon-yellow: #ffff00;
+      --neon-green: #00ff00;
+      --bg: #000000;
+    }
+    
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+      cursor: none;
+    }
+    
+    /* ===== CANVAS ===== */
+    #canvas3d {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    
+    /* ===== CURSOR ===== */
+    #cursor {
+      position: fixed;
+      width: 30px;
+      height: 30px;
+      border: 2px solid var(--neon-cyan);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      mix-blend-mode: difference;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    #cursor.active {
+      transform: scale(0.5);
+      background: var(--neon-cyan);
+      box-shadow: 0 0 30px var(--neon-cyan);
+    }
+    
+    /* ===== VIGNETTE ===== */
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+    }
+    
+    /* ===== GRAIN ===== */
+    .grain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      animation: grain 8s steps(10) infinite;
+    }
+    
+    @keyframes grain {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-5%, -10%); }
+      20% { transform: translate(-15%, 5%); }
+      30% { transform: translate(7%, -25%); }
+      40% { transform: translate(-5%, 25%); }
+      50% { transform: translate(-15%, 10%); }
+      60% { transform: translate(15%, 0%); }
+      70% { transform: translate(0%, 15%); }
+      80% { transform: translate(3%, 35%); }
+      90% { transform: translate(-10%, 10%); }
+    }
+    
+    /* ===== UI OVERLAY ===== */
+    .ui-overlay {
+      position: relative;
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    .ui-overlay * {
+      pointer-events: auto;
+    }
+    
+    /* ===== HEADER ===== */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 30px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+    }
+    
+    .logo {
+      font-family: 'Michroma', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      position: relative;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 20px var(--neon-cyan));
+    }
+    
+    .logo::before {
+      content: 'QUANTUM.DEV';
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0.3;
+      animation: glitch 5s infinite;
+    }
+    
+    @keyframes glitch {
+      0%, 90%, 100% { transform: translate(0); opacity: 0; }
+      92% { transform: translate(-3px, 3px); opacity: 0.3; color: var(--neon-cyan); }
+      94% { transform: translate(3px, -3px); opacity: 0.3; color: var(--neon-magenta); }
+      96% { transform: translate(-3px, 3px); opacity: 0.3; color: var(--neon-cyan); }
+    }
+    
+    nav {
+      display: flex;
+      gap: 50px;
+    }
+    
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 500;
+      position: relative;
+      transition: all 0.3s;
+    }
+    
+    nav a::before {
+      content: '>';
+      position: absolute;
+      left: -15px;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    
+    nav a:hover {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 20px var(--neon-cyan);
+    }
+    
+    nav a:hover::before {
+      opacity: 1;
+      left: -20px;
+    }
+    
+    /* ===== HERO ===== */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    
+    .hero-tag {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      letter-spacing: 10px;
+      text-transform: uppercase;
+      color: var(--neon-cyan);
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeInUp 1s 0.5s forwards;
+      position: relative;
+    }
+    
+    .hero-tag::before,
+    .hero-tag::after {
+      content: '///';
+      position: absolute;
+      color: var(--neon-magenta);
+      opacity: 0.5;
+    }
+    
+    .hero-tag::before {
+      left: -40px;
+    }
+    
+    .hero-tag::after {
+      right: -40px;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .hero h1 {
+      font-family: 'Michroma', sans-serif;
+      font-size: clamp(4rem, 15vw, 12rem);
+      font-weight: 700;
+      line-height: 0.85;
+      margin-bottom: 40px;
+      position: relative;
+      opacity: 0;
+      animation: fadeInUp 1s 0.8s forwards;
+    }
+    
+    .hero h1 .line {
+      display: block;
+      background: linear-gradient(90deg, 
+        var(--neon-cyan) 0%, 
+        var(--neon-magenta) 50%, 
+        var(--neon-yellow) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 8s ease infinite;
+      background-size: 200% auto;
+      filter: drop-shadow(0 0 40px var(--neon-cyan));
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+    
+    .hero p {
+      max-width: 700px;
+      font-size: 16px;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 50px;
+      opacity: 0;
+      animation: fadeInUp 1s 1.2s forwards;
+    }
+    
+    .cta-group {
+      display: flex;
+      gap: 30px;
+      opacity: 0;
+      animation: fadeInUp 1s 1.5s forwards;
+    }
+    
+    .btn {
+      padding: 18px 45px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+    }
+    
+    .btn-primary {
+      color: #000;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    }
+    
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--neon-magenta);
+      transition: left 0.3s;
+      z-index: -1;
+    }
+    
+    .btn-primary:hover::before {
+      left: 0;
+    }
+    
+    .btn-primary:hover {
+      color: #fff;
+      box-shadow: 0 0 50px rgba(255, 0, 255, 0.7);
+    }
+    
+    .btn-secondary {
+      color: var(--neon-cyan);
+      border: 2px solid var(--neon-cyan);
+    }
+    
+    .btn-secondary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--neon-cyan);
+      transition: left 0.3s;
+      z-index: -1;
+    }
+    
+    .btn-secondary:hover::before {
+      left: 0;
+    }
+    
+    .btn-secondary:hover {
+      color: #000;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    }
+    
+    /* ===== STATS HUD ===== */
+    .stats-hud {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 60px;
+      padding: 25px 50px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 50px;
+      z-index: 100;
+      font-family: 'Rajdhani', sans-serif;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 20px var(--neon-cyan);
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* ===== SCROLL HINT ===== */
+    .scroll-hint {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      opacity: 0;
+      animation: fadeInUp 1s 2s forwards, float 3s 2s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(-50%, 0); }
+      50% { transform: translate(-50%, -15px); }
+    }
+    
+    .scroll-hint span {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .scroll-line {
+      width: 2px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--neon-cyan), transparent);
+      position: relative;
+    }
+    
+    .scroll-line::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: var(--neon-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 15px var(--neon-cyan);
+      animation: scrollDot 2s infinite;
+    }
+    
+    @keyframes scrollDot {
+      0% { top: 0; opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    
+    /* ===== SECTIONS ===== */
+    section {
+      min-height: 100vh;
+      padding: 120px 60px;
+      position: relative;
+    }
+    
+    .section-title {
+      font-family: 'Michroma', sans-serif;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 700;
+      margin-bottom: 80px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+    
+    .section-title::before {
+      content: '>';
+      position: absolute;
+      left: -50px;
+      color: var(--neon-cyan);
+      opacity: 0.5;
+    }
+    
+    /* ===== PROJECTS GRID ===== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 40px;
+      margin-top: 80px;
+    }
+    
+    .project-card {
+      background: rgba(0, 255, 255, 0.02);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      padding: 50px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta), var(--neon-yellow));
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.5s;
+    }
+    
+    .project-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, transparent 0%, rgba(0, 255, 255, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 30px 80px rgba(0, 255, 255, 0.3);
+    }
+    
+    .project-card:hover::before {
+      opacity: 1;
+    }
+    
+    .project-card:hover::after {
+      opacity: 1;
+    }
+    
+    .project-number {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      color: var(--neon-magenta);
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+    }
+    
+    .project-card h3 {
+      font-family: 'Michroma', sans-serif;
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: var(--neon-cyan);
+    }
+    
+    .project-card p {
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+    
+    .tech-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .tech-tag {
+      padding: 8px 18px;
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid var(--neon-cyan);
+      font-size: 11px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .tech-tag:hover {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: 0 0 20px var(--neon-cyan);
+    }
+    
+    /* ===== LOADING ===== */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100000;
+      transition: opacity 0.8s;
+    }
+    
+    .loader-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+    }
+    
+    .loader-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-top-color: var(--neon-cyan);
+      border-radius: 50%;
+      animation: spin 1.5s linear infinite;
+    }
+    
+    .loader-ring:nth-child(2) {
+      border-top-color: var(--neon-magenta);
+      animation-duration: 2s;
+      animation-direction: reverse;
+    }
+    
+    .loader-ring:nth-child(3) {
+      border-top-color: var(--neon-yellow);
+      animation-duration: 2.5s;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      margin-top: 40px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      letter-spacing: 5px;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    .loading-progress {
+      margin-top: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 24px;
+      color: var(--neon-magenta);
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      header {
+        padding: 20px;
+      }
+      
+      nav {
+        gap: 20px;
+      }
+      
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      section {
+        padding: 80px 20px;
+      }
+      
+      .stats-hud {
+        flex-direction: column;
+        gap: 20px;
+        bottom: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-
-    <button id="init-btn">SYSTEM SCAN START</button>
-    <canvas id="webgl-canvas"></canvas>
-
-    <div id="interface">
-        <nav class="navbar navbar-expand px-2">
-            <div class="navbar-nav mx-auto gap-3">
-                <a class="nav-link" href="#" onclick="moveCam(0, 40, 0, 'lab')">LAB</a>
-                <a class="nav-link" href="#" onclick="moveCam(30, 0, 30, 'data')">DATA</a>
-                <a class="nav-link" href="#" onclick="moveCam(-30, -20, 10, 'comm')">COMM</a>
-            </div>
-        </nav>
-
-        <div id="hero" class="section-content visible">
-            <h1 class="glitch-title">CORE.IX</h1>
-            <p class="small text-info opacity-75">MOBILE_NODE // ACTIVE</p>
-        </div>
-
-        <div id="lab" class="section-content">
-            <h2 class="h4 fw-bold text-uppercase">Expériences</h2>
-            <div class="row g-2 mt-3">
-                <div class="col-6"><div class="p-2 border border-info small">WEBGL_01</div></div>
-                <div class="col-6"><div class="p-2 border border-info small">SHAD_05</div></div>
-            </div>
-        </div>
-
-        <div id="data" class="section-content">
-            <h2 class="h4 fw-bold">STACK_TECH</h2>
-            <p class="small text-white-50">THREE.JS / GSAP / GLSL</p>
-        </div>
-
-        <div id="comm" class="section-content">
-            <h2 class="h4 fw-bold">LINK_START</h2>
-            <input type="text" class="form-control bg-transparent border-info text-info mb-2 small" placeholder="NAME">
-            <button class="btn btn-outline-info btn-sm w-100">SEND</button>
-        </div>
+  
+  <!-- LOADING SCREEN -->
+  <div id="loading">
+    <div class="loader-container">
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
     </div>
-
-    <script type="module">
-        import * as THREE from 'three';
-        import gsap from 'gsap';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-
-        let scene, camera, renderer, composer, grid, dummy;
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    <div class="loading-text">Initializing Quantum Core</div>
+    <div class="loading-progress">0%</div>
+  </div>
+  
+  <!-- CUSTOM CURSOR -->
+  <div id="cursor"></div>
+  
+  <!-- VIGNETTE & GRAIN -->
+  <div class="vignette"></div>
+  <div class="grain"></div>
+  
+  <!-- 3D CANVAS -->
+  <canvas id="canvas3d"></canvas>
+  
+  <!-- UI OVERLAY -->
+  <div class="ui-overlay">
+    
+    <!-- HEADER -->
+    <header>
+      <div class="logo">QUANTUM.DEV</div>
+      <nav>
+        <a href="#home">HOME</a>
+        <a href="#work">WORK</a>
+        <a href="#skills">SKILLS</a>
+        <a href="#contact">CONTACT</a>
+      </nav>
+    </header>
+    
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div class="hero-tag">/// DIMENSIONAL ARCHITECT ///</div>
+      <h1>
+        <span class="line">BEYOND</span>
+        <span class="line">REALITY</span>
+      </h1>
+      <p>
+        Architecte d'expériences immersives transcendant les frontières du possible.
+        Maîtrisant l'art du raymarching volumétrique, des flow fields quantiques,
+        et des distorsions d'espace-temps pour créer l'impossible.
+      </p>
+      <div class="cta-group">
+        <button class="btn btn-primary">EXPLORER LA DIMENSION</button>
+        <button class="btn btn-secondary">VOIR MES CRÉATIONS</button>
+      </div>
+      
+      <div class="scroll-hint">
+        <span>SCROLL</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+    
+    <!-- STATS HUD -->
+    <div class="stats-hud">
+      <div class="stat-item">
+        <span class="stat-value">75+</span>
+        <span class="stat-label">Projets</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">∞</span>
+        <span class="stat-label">Dimensions</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">100%</span>
+        <span class="stat-label">Quantique</span>
+      </div>
+    </div>
+    
+    <!-- PROJECTS -->
+    <section id="work">
+      <h2 class="section-title">SELECTED WORK</h2>
+      
+      <div class="projects-grid">
         
-        function init() {
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x000000, 0.03);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 500);
-            camera.position.z = isMobile ? 60 : 40;
-
-            renderer = new THREE.WebGLRenderer({ 
-                canvas: document.querySelector('#webgl-canvas'), 
-                antialias: !isMobile, // Désactive l'AA sur mobile pour gagner des FPS
-                powerPreference: "high-performance" 
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            composer = new EffectComposer(renderer);
-            composer.addPass(new RenderPass(scene, camera));
+        <div class="project-card">
+          <div class="project-number">// 01</div>
+          <h3>VOID DIMENSION</h3>
+          <p>
+            Portail interdimensionnel avec raymarching volumétrique temps réel.
+            Distorsions d'espace-temps, effets de lentille gravitationnelle,
+            et particules quantiques réagissant à l'audio.
+          </p>
+          <div class="tech-list">
+            <span class="tech-tag">Raymarching</span>
+            <span class="tech-tag">GLSL</span>
+            <span class="tech-tag">Audio Reactive</span>
+            <span class="tech-tag">WebGL2</span>
+          </div>
+        </div>
+        
+        <div class="project-card">
+          <div class="project-number">// 02</div>
+          <h3>QUANTUM NEXUS</h3>
+          <p>
+            Système de particules avec flow fields et curl noise.
+            500K particules GPU-driven avec compute shaders,
+            simulation de fluides MLS-MPM en temps réel.
+          </p>
+          <div class="tech-list">
+            <span class="tech-tag">Compute Shaders</span>
+            <span class="tech-tag">Flow Fields</span>
+            <span class="tech-tag">Three.js</span>
+            <span class="tech-tag">MLS-MPM</span>
+          </div>
+        </div>
+        
+        <div class="project-card">
+          <div class="project-number">// 03</div>
+          <h3>NEURAL SPACE</h3>
+          <p>
+            Interface IA générative avec visualisation de données neuronales.
+            Path tracing pour éclairage photoréaliste,
+            rendu volumétrique de nuages procéduraux.
+          </p>
+          <div class="tech-list">
+            <span class="tech-tag">Path Tracing</span>
+            <span class="tech-tag">TensorFlow.js</span>
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">WebGPU</span>
+          </div>
+        </div>
+        
+        <div class="project-card">
+          <div class="project-number">// 04</div>
+          <h3>COSMIC FLUX</h3>
+          <p>
+            Expérience narrative immersive combinant audio spatial 3D,
+            effets holographiques avancés, et transitions
+            fluides entre dimensions parallèles.
+          </p>
+          <div class="tech-list">
+            <span class="tech-tag">Spatial Audio</span>
+            <span class="tech-tag">GSAP</span>
+            <span class="tech-tag">Tone.js</span>
+            <span class="tech-tag">Custom Shaders</span>
+          </div>
+        </div>
+        
+        <div class="project-card">
+          <div class="project-number">// 05</div>
+          <h3>HYPER MATRIX</h3>
+          <p>
+            Dashboard temps réel avec métriques GPU-accelerated.
+            Graphiques 3D volumétriques, effets de bloom HDR,
+            et système de particules réactif aux données.
+          </p>
+          <div class="tech-list">
+            <span class="tech-tag">WebGL2</span>
+            <span class="tech-tag">D3.js</span>
+            <span class="tech-tag">HDR Rendering</span>
+            <span class="tech-tag">Post-FX</span>
+          </div>
+        </div>
+        
+        <div class="project-card">
+          <div class="project-number">// 06</div>
+          <h3>FRACTAL DREAMS</h3>
+          <p>
+            Exploration interactive de fractales 4D avec mandelbulb raymarching.
+            Génération procédurale infinie, zoom illimité,
+            et couleurs psychédéliques audio-réactives.
+          </p>
+          <div class="tech-list">
+            <span class="tech-tag">Mandelbulb</span>
+            <span class="tech-tag">4D Math</span>
+            <span class="tech-tag">Procedural</span>
+            <span class="tech-tag">Infinite Zoom</span>
+          </div>
+        </div>
+        
+      </div>
+    </section>
+    
+  </div>
+  
+  <!-- THREE.JS SCRIPT -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+    import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+    
+    // ===================================
+    // CUSTOM SHADERS - ADVANCED 2025
+    // ===================================
+    
+    // Volumetric Raymarching Shader for Dimensional Portal
+    const PortalShader = {
+      uniforms: {
+        time: { value: 0 },
+        resolution: { value: new THREE.Vector2() },
+        mouse: { value: new THREE.Vector2() }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        uniform vec2 resolution;
+        uniform vec2 mouse;
+        varying vec2 vUv;
+        
+        #define MAX_STEPS 100
+        #define MAX_DIST 100.0
+        #define SURF_DIST 0.001
+        
+        // Noise functions
+        vec3 hash3(vec3 p) {
+          p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+                   dot(p, vec3(269.5, 183.3, 246.1)),
+                   dot(p, vec3(113.5, 271.9, 124.6)));
+          return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+        }
+        
+        float noise(vec3 p) {
+          vec3 i = floor(p);
+          vec3 f = fract(p);
+          f = f * f * (3.0 - 2.0 * f);
+          
+          return mix(
+            mix(mix(dot(hash3(i + vec3(0, 0, 0)), f - vec3(0, 0, 0)),
+                    dot(hash3(i + vec3(1, 0, 0)), f - vec3(1, 0, 0)), f.x),
+                mix(dot(hash3(i + vec3(0, 1, 0)), f - vec3(0, 1, 0)),
+                    dot(hash3(i + vec3(1, 1, 0)), f - vec3(1, 1, 0)), f.x), f.y),
+            mix(mix(dot(hash3(i + vec3(0, 0, 1)), f - vec3(0, 0, 1)),
+                    dot(hash3(i + vec3(1, 0, 1)), f - vec3(1, 0, 1)), f.x),
+                mix(dot(hash3(i + vec3(0, 1, 1)), f - vec3(0, 1, 1)),
+                    dot(hash3(i + vec3(1, 1, 1)), f - vec3(1, 1, 1)), f.x), f.y), f.z
+          );
+        }
+        
+        float fbm(vec3 p) {
+          float value = 0.0;
+          float amplitude = 0.5;
+          float frequency = 1.0;
+          
+          for(int i = 0; i < 6; i++) {
+            value += amplitude * noise(p * frequency);
+            frequency *= 2.0;
+            amplitude *= 0.5;
+          }
+          
+          return value;
+        }
+        
+        // SDF for portal torus
+        float sdTorus(vec3 p, vec2 t) {
+          vec2 q = vec2(length(p.xz) - t.x, p.y);
+          return length(q) - t.y;
+        }
+        
+        // Volumetric density function
+        float getDensity(vec3 p) {
+          float dist = sdTorus(p, vec2(3.0, 0.8));
+          
+          // Add turbulence
+          float turbulence = fbm(p * 2.0 + time * 0.3);
+          
+          // Create volumetric effect
+          float density = -dist + turbulence * 0.5;
+          
+          // Add swirling effect
+          float angle = atan(p.z, p.x) + time * 0.5;
+          density += sin(angle * 5.0 + time) * 0.2;
+          
+          return density;
+        }
+        
+        // Volumetric raymarching
+        vec4 raymarch(vec3 ro, vec3 rd) {
+          float depth = 0.0;
+          vec4 color = vec4(0.0);
+          
+          for(int i = 0; i < MAX_STEPS; i++) {
+            vec3 p = ro + rd * depth;
             
-            // Bloom léger sur mobile, fort sur PC
-            const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), isMobile ? 0.8 : 1.5, 0.4, 0.85);
-            composer.addPass(bloom);
-
-            createGrid();
+            float density = getDensity(p);
+            
+            if(density > 0.0) {
+              // Color based on depth and density
+              vec3 col = vec3(0.0, 1.0, 1.0) * density; // Cyan
+              col += vec3(1.0, 0.0, 1.0) * (1.0 - density * 0.5); // Magenta
+              
+              // Add glow based on distance to center
+              float glow = 1.0 - smoothstep(0.0, 4.0, length(p));
+              col += glow * vec3(1.0, 1.0, 0.0) * 0.5; // Yellow glow
+              
+              // Accumulate color
+              float alpha = density * 0.1;
+              color.rgb += col * alpha * (1.0 - color.a);
+              color.a += alpha;
+              
+              if(color.a > 0.95) break;
+            }
+            
+            depth += 0.05; // Fixed step size for volumetric
+            
+            if(depth > MAX_DIST) break;
+          }
+          
+          return color;
+        }
+        
+        void main() {
+          vec2 uv = (vUv - 0.5) * 2.0;
+          uv.x *= resolution.x / resolution.y;
+          
+          // Camera setup
+          vec3 ro = vec3(0.0, 0.0, 8.0);
+          vec3 rd = normalize(vec3(uv, -1.0));
+          
+          // Rotate camera based on mouse
+          float mx = mouse.x * 6.28;
+          float my = mouse.y * 3.14;
+          mat2 rotX = mat2(cos(mx), -sin(mx), sin(mx), cos(mx));
+          mat2 rotY = mat2(cos(my), -sin(my), sin(my), cos(my));
+          ro.xz *= rotX;
+          rd.xz *= rotX;
+          ro.yz *= rotY;
+          rd.yz *= rotY;
+          
+          // Raymarch
+          vec4 color = raymarch(ro, rd);
+          
+          // Add background stars
+          if(color.a < 1.0) {
+            float stars = smoothstep(0.99, 1.0, noise(rd * 100.0));
+            color.rgb += stars * vec3(1.0) * (1.0 - color.a);
+          }
+          
+          gl_FragColor = vec4(color.rgb, 1.0);
+        }
+      `
+    };
+    
+    // Flow Field Shader
+    const FlowFieldShader = {
+      uniforms: {
+        tDiffuse: { value: null },
+        time: { value: 0 },
+        intensity: { value: 0.3 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform float time;
+        uniform float intensity;
+        varying vec2 vUv;
+        
+        vec3 hash3(vec3 p) {
+          p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+                   dot(p, vec3(269.5, 183.3, 246.1)),
+                   dot(p, vec3(113.5, 271.9, 124.6)));
+          return fract(sin(p) * 43758.5453123);
+        }
+        
+        // Curl noise for flow field
+        vec3 curlNoise(vec3 p) {
+          const float e = 0.1;
+          vec3 dx = vec3(e, 0.0, 0.0);
+          vec3 dy = vec3(0.0, e, 0.0);
+          vec3 dz = vec3(0.0, 0.0, e);
+          
+          vec3 p_x0 = hash3(p - dx);
+          vec3 p_x1 = hash3(p + dx);
+          vec3 p_y0 = hash3(p - dy);
+          vec3 p_y1 = hash3(p + dy);
+          vec3 p_z0 = hash3(p - dz);
+          vec3 p_z1 = hash3(p + dz);
+          
+          float x = p_y1.z - p_y0.z - p_z1.y + p_z0.y;
+          float y = p_z1.x - p_z0.x - p_x1.z + p_x0.z;
+          float z = p_x1.y - p_x0.y - p_y1.x + p_y0.x;
+          
+          return normalize(vec3(x, y, z));
+        }
+        
+        void main() {
+          vec2 uv = vUv;
+          
+          // Apply flow field distortion
+          vec3 flowPos = vec3(uv * 3.0, time * 0.2);
+          vec3 flow = curlNoise(flowPos);
+          
+          vec2 distortion = flow.xy * intensity * 0.02;
+          uv += distortion;
+          
+          vec4 color = texture2D(tDiffuse, uv);
+          
+          // Add chromatic aberration
+          float aberration = 0.002;
+          float r = texture2D(tDiffuse, uv + vec2(aberration, 0.0)).r;
+          float g = texture2D(tDiffuse, uv).g;
+          float b = texture2D(tDiffuse, uv - vec2(aberration, 0.0)).b;
+          
+          color = vec4(r, g, b, color.a);
+          
+          gl_FragColor = color;
+        }
+      `
+    };
+    
+    // ===================================
+    // SCENE SETUP
+    // ===================================
+    
+    const canvas = document.getElementById('canvas3d');
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x000000, 0.015);
+    
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 20;
+    
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.5;
+    
+    // ===================================
+    // DIMENSIONAL PORTAL
+    // ===================================
+    
+    const portalGeometry = new THREE.PlaneGeometry(20, 20);
+    const portalMaterial = new THREE.ShaderMaterial({
+      uniforms: PortalShader.uniforms,
+      vertexShader: PortalShader.vertexShader,
+      fragmentShader: PortalShader.fragmentShader,
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+    
+    const portal = new THREE.Mesh(portalGeometry, portalMaterial);
+    scene.add(portal);
+    
+    // Update resolution
+    portalMaterial.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+    
+    // ===================================
+    // FLOW FIELD PARTICLES
+    // ===================================
+    
+    const particleCount = 10000;
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+    
+    const colorPalette = [
+      new THREE.Color(0x00ffff), // Cyan
+      new THREE.Color(0xff00ff), // Magenta
+      new THREE.Color(0xffff00), // Yellow
+      new THREE.Color(0x00ff00)  // Green
+    ];
+    
+    for (let i = 0; i < particleCount; i++) {
+      const i3 = i * 3;
+      
+      // Random position in sphere
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const radius = 15 + Math.random() * 10;
+      
+      positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i3 + 2] = radius * Math.cos(phi);
+      
+      // Random velocity
+      velocities[i3] = (Math.random() - 0.5) * 0.02;
+      velocities[i3 + 1] = (Math.random() - 0.5) * 0.02;
+      velocities[i3 + 2] = (Math.random() - 0.5) * 0.02;
+      
+      // Random color
+      const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+      colors[i3] = color.r;
+      colors[i3 + 1] = color.g;
+      colors[i3 + 2] = color.b;
+      
+      sizes[i] = Math.random() * 3 + 1;
+    }
+    
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    particleGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    
+    const particleMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        time: { value: 0 },
+        pixelRatio: { value: renderer.getPixelRatio() }
+      },
+      vertexShader: `
+        attribute float size;
+        varying vec3 vColor;
+        uniform float time;
+        uniform float pixelRatio;
+        
+        void main() {
+          vColor = color;
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          
+          float pulse = 1.0 + 0.5 * sin(time * 3.0 + position.x * 0.1);
+          
+          gl_PointSize = size * pulse * pixelRatio * (400.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        
+        void main() {
+          vec2 center = gl_PointCoord - vec2(0.5);
+          float dist = length(center);
+          
+          if (dist > 0.5) discard;
+          
+          float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
+          
+          vec3 glow = vColor * (1.0 + 1.5 * (1.0 - dist * 2.0));
+          
+          gl_FragColor = vec4(glow, alpha);
+        }
+      `,
+      transparent: true,
+      vertexColors: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
+    
+    // ===================================
+    // GEOMETRIC SHAPES - WIREFRAME GRID
+    // ===================================
+    
+    const gridCount = 8;
+    const grids = [];
+    
+    for (let i = 0; i < gridCount; i++) {
+      const geometry = new THREE.IcosahedronGeometry(5 + i * 3, 0);
+      const material = new THREE.MeshBasicMaterial({
+        color: colorPalette[i % colorPalette.length],
+        wireframe: true,
+        transparent: true,
+        opacity: 0.15
+      });
+      
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.z = -i * 8;
+      
+      grids.push({
+        mesh,
+        rotationSpeed: 0.001 + Math.random() * 0.002
+      });
+      
+      scene.add(mesh);
+    }
+    
+    // ===================================
+    // POST-PROCESSING
+    // ===================================
+    
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    
+    // Bloom
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      2.0,  // strength
+      0.6,  // radius
+      0.3   // threshold
+    );
+    composer.addPass(bloomPass);
+    
+    // Film grain
+    const filmPass = new FilmPass(0.2, 0.5, 2048, false);
+    composer.addPass(filmPass);
+    
+    // Flow field distortion
+    const flowPass = new ShaderPass(FlowFieldShader);
+    composer.addPass(flowPass);
+    
+    // ===================================
+    // MOUSE INTERACTION
+    // ===================================
+    
+    const mouse = { x: 0, y: 0 };
+    const targetMouse = { x: 0, y: 0 };
+    
+    document.addEventListener('mousemove', (e) => {
+      targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      
+      // Update portal shader
+      portalMaterial.uniforms.mouse.value.x = targetMouse.x * 0.5 + 0.5;
+      portalMaterial.uniforms.mouse.value.y = targetMouse.y * 0.5 + 0.5;
+    });
+    
+    // ===================================
+    // CURSOR
+    // ===================================
+    
+    const cursor = document.getElementById('cursor');
+    let cursorX = 0, cursorY = 0;
+    
+    document.addEventListener('mousemove', (e) => {
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+    });
+    
+    document.addEventListener('mousedown', () => {
+      cursor.classList.add('active');
+    });
+    
+    document.addEventListener('mouseup', () => {
+      cursor.classList.remove('active');
+    });
+    
+    function updateCursor() {
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
+      requestAnimationFrame(updateCursor);
+    }
+    updateCursor();
+    
+    // ===================================
+    // ANIMATION LOOP
+    // ===================================
+    
+    const clock = new THREE.Clock();
+    
+    // Curl noise function for particles
+    function curlNoise(x, y, z, t) {
+      const n1 = Math.sin(x * 2 + t) * Math.cos(y * 2);
+      const n2 = Math.cos(x * 2) * Math.sin(z * 2 + t);
+      const n3 = Math.sin(y * 2) * Math.cos(z * 2);
+      
+      return {
+        x: n1 * 0.5,
+        y: n2 * 0.5,
+        z: n3 * 0.5
+      };
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const elapsedTime = clock.getElapsedTime();
+      
+      // Update shader uniforms
+      portalMaterial.uniforms.time.value = elapsedTime;
+      particleMaterial.uniforms.time.value = elapsedTime;
+      flowPass.uniforms.time.value = elapsedTime;
+      
+      // Smooth mouse following
+      mouse.x += (targetMouse.x - mouse.x) * 0.05;
+      mouse.y += (targetMouse.y - mouse.y) * 0.05;
+      
+      // Rotate portal
+      portal.rotation.z = elapsedTime * 0.1;
+      
+      // Update particles with flow field
+      const positions = particleGeometry.attributes.position.array;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        
+        const x = positions[i3];
+        const y = positions[i3 + 1];
+        const z = positions[i3 + 2];
+        
+        // Apply curl noise flow field
+        const flow = curlNoise(x * 0.1, y * 0.1, z * 0.1, elapsedTime * 0.5);
+        
+        velocities[i3] += flow.x * 0.001;
+        velocities[i3 + 1] += flow.y * 0.001;
+        velocities[i3 + 2] += flow.z * 0.001;
+        
+        // Apply velocity
+        positions[i3] += velocities[i3];
+        positions[i3 + 1] += velocities[i3 + 1];
+        positions[i3 + 2] += velocities[i3 + 2];
+        
+        // Attraction to center
+        const dist = Math.sqrt(x * x + y * y + z * z);
+        if (dist > 30) {
+          positions[i3] *= 0.99;
+          positions[i3 + 1] *= 0.99;
+          positions[i3 + 2] *= 0.99;
+        }
+        
+        // Damping
+        velocities[i3] *= 0.99;
+        velocities[i3 + 1] *= 0.99;
+        velocities[i3 + 2] *= 0.99;
+      }
+      
+      particleGeometry.attributes.position.needsUpdate = true;
+      
+      // Rotate grids
+      grids.forEach((grid, index) => {
+        grid.mesh.rotation.x += grid.rotationSpeed;
+        grid.mesh.rotation.y += grid.rotationSpeed * 0.7;
+        
+        // Move grids forward
+        grid.mesh.position.z += 0.05;
+        
+        if (grid.mesh.position.z > 20) {
+          grid.mesh.position.z = -(gridCount - 1) * 8;
+        }
+        
+        // Pulsate
+        const scale = 1 + Math.sin(elapsedTime * 2 + index) * 0.1;
+        grid.mesh.scale.set(scale, scale, scale);
+      });
+      
+      // Camera movement
+      camera.position.x = mouse.x * 3;
+      camera.position.y = mouse.y * 3;
+      camera.lookAt(scene.position);
+      
+      // Render
+      composer.render();
+    }
+    
+    // ===================================
+    // WINDOW RESIZE
+    // ===================================
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+      
+      portalMaterial.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+    });
+    
+    // ===================================
+    // LOADING SIMULATION
+    // ===================================
+    
+    const loadingEl = document.getElementById('loading');
+    const progressEl = document.querySelector('.loading-progress');
+    let progress = 0;
+    
+    const loadingInterval = setInterval(() => {
+      progress += Math.random() * 15;
+      if (progress > 100) progress = 100;
+      
+      progressEl.textContent = Math.floor(progress) + '%';
+      
+      if (progress >= 100) {
+        clearInterval(loadingInterval);
+        
+        setTimeout(() => {
+          loadingEl.style.opacity = '0';
+          
+          setTimeout(() => {
+            loadingEl.style.display = 'none';
             animate();
+          }, 800);
+        }, 500);
+      }
+    }, 100);
+    
+    // ===================================
+    // SMOOTH SCROLL
+    // ===================================
+    
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-
-        function createGrid() {
-            const count = isMobile ? 400 : 1000; // Moins de cubes sur mobile
-            const geometry = new THREE.BoxGeometry(0.4, 0.4, 0.4);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.6 });
-            
-            grid = new THREE.InstancedMesh(geometry, material, count);
-            dummy = new THREE.Object3D();
-            
-            for(let i = 0; i < count; i++) {
-                dummy.position.set((Math.random()-0.5)*80, (Math.random()-0.5)*80, (Math.random()-0.5)*80);
-                dummy.updateMatrix();
-                grid.setMatrixAt(i, dummy.matrix);
-            }
-            scene.add(grid);
-        }
-
-        window.moveCam = (x, y, z, sectionId) => {
-            gsap.to(camera.position, { 
-                x, y, z: isMobile ? z + 50 : z + 30, 
-                duration: 1.5, 
-                ease: "power3.inOut" 
-            });
-            
-            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('visible'));
-            document.getElementById(sectionId).classList.add('visible');
-        };
-
-        const btn = document.querySelector('#init-btn');
-        btn.onclick = () => {
-            gsap.to(btn, { opacity: 0, scale: 0, duration: 0.5, onComplete: () => btn.remove() });
-            init();
-        };
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if(grid) {
-                grid.rotation.y += 0.001;
-                grid.rotation.x += 0.0005;
-            }
-            composer.render();
-        }
-
-        // Tactile : Parallaxe gyroscope-like
-        window.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            const moveX = (touch.clientX / window.innerWidth) - 0.5;
-            const moveY = (touch.clientY / window.innerHeight) - 0.5;
-            gsap.to(camera.rotation, { y: -moveX * 0.2, x: moveY * 0.2, duration: 1 });
-        });
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+      });
+    });
+    
+  </script>
+  
 </body>
 </html>
