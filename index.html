@@ -1,231 +1,242 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VERCO-PHOTO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0a0a0a;
-            --text: #f0f0f0;
-            --accent: #ff3c00;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio | Ultra Edition</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
-        /* RESET & BASE */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Montserrat', sans-serif;
-            overflow-x: hidden; /* Empêche le scroll horizontal parasite */
-            line-height: 1.6;
-        }
+  <style>
+    :root {
+      --accent: #00f2ff;
+      --bg: #030303;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
 
-        /* --- CURSEUR LOUPE --- */
-        #cursor {
-            position: fixed; width: 150px; height: 150px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            background-repeat: no-repeat;
-            background-color: rgba(0,0,0,0.5);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10000;
-            display: none;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(255,255,255,0.2);
-            transform: translate(-50%, -50%);
-        }
+    body {
+      background-color: var(--bg);
+      color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+      cursor: none; /* On cache le curseur pour le custom */
+    }
 
-        /* --- UI ELEMENTS --- */
-        .reveal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 1000; transition: 1.5s ease-in-out; }
-        .grain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://grainy-gradients.vercel.app/noise.svg'); opacity: 0.04; pointer-events: none; z-index: 50; }
+    /* --- CURSEUR PERSONNALISÉ --- */
+    #custom-cursor {
+      width: 20px;
+      height: 20px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transition: transform 0.1s ease;
+    }
 
-        nav { position: fixed; top: 0; width: 100%; padding: 40px; display: flex; justify-content: space-between; z-index: 100; mix-blend-mode: difference; }
-        .logo { font-family: 'Italiana', serif; font-size: 1.8rem; letter-spacing: 2px; }
+    /* --- BACKGROUND ANIMÉ --- */
+    #canvas-container {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1;
+      opacity: 0.4;
+    }
 
-        /* --- GALLERY SYSTEM --- */
-        .section-gallery { height: 100vh; position: sticky; top: 0; overflow: hidden; }
+    /* --- NAV --- */
+    .navbar {
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 25px 0;
+    }
+    .navbar-brand {
+      font-family: 'Syncopate', sans-serif;
+      letter-spacing: 5px;
+      color: var(--accent) !important;
+    }
 
-        .gallery-wrapper {
-            display: flex;
-            align-items: center;
-            height: 100vh;
-            padding: 0 10vw;
-            gap: 10vw;
-            will-change: transform;
-            transition: transform 0.1s ease-out;
-        }
+    /* --- HERO --- */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .glitch-text {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(3rem, 10vw, 8rem);
+      line-height: 0.9;
+      text-transform: uppercase;
+      font-weight: 700;
+      background: linear-gradient(45deg, #fff 30%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        .gallery-item {
-            position: relative; flex-shrink: 0; width: 30vw; height: 60vh;
-            background: #151515; overflow: hidden;
-            transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-            filter: grayscale(1); background-size: cover; background-position: center;
-            cursor: none;
-        }
-        .gallery-item:hover { width: 40vw; filter: grayscale(0); }
+    /* --- PROJECT CARDS --- */
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2px;
+      overflow: hidden;
+      transition: var(--transition);
+      position: relative;
+    }
 
-        .item-info { position: absolute; bottom: -50px; left: 20px; transition: 0.5s; }
-        .gallery-item:hover .item-info { bottom: 20px; }
-        .item-info h2 { font-family: 'Italiana', serif; font-size: 2.5rem; }
+    .project-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px rgba(0, 242, 255, 0.1);
+    }
 
-        /* IMAGES DATA */
-        .item-1 { background-image: url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1000'); }
-        .item-2 { background-image: url('https://images.unsplash.com/photo-1506318137071-a8e063b4b519?q=80&w=1000'); }
-        .item-3 { background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000'); }
-        .item-4 { background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000'); }
-        .item-5 { background-image: url('https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1000'); }
+    .card-content {
+      background: var(--bg);
+      border-radius: 18px;
+      padding: 30px;
+      height: 100%;
+    }
 
-        .progress-container { position: fixed; bottom: 50px; left: 10%; width: 80%; height: 2px; background: rgba(255,255,255,0.1); z-index: 100; }
-        .progress-bar { width: 0%; height: 100%; background: var(--accent); transition: 0.1s; }
+    .btn-action {
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 10px 25px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      transition: var(--transition);
+    }
 
-        /* --- CONTACT SECTION --- */
-        .cyber-contact { min-height: 100vh; padding: 150px 10%; background: #050505; border-top: 1px solid var(--accent); position: relative; z-index: 2; }
-        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 100px; width: 100%; }
-        .contact-header h1 { font-family: 'Italiana', serif; font-size: clamp(3rem, 8vw, 5rem); line-height: 0.9; margin-top: 20px;}
+    .btn-action:hover {
+      background: var(--accent);
+      color: #000;
+    }
 
-        .glitch { position: relative; font-size: 0.8rem; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
-        .status-light { width: 10px; height: 10px; background: var(--accent); display: inline-block; border-radius: 50%; box-shadow: 0 0 15px var(--accent); animation: blink 1s infinite; margin-right: 10px; }
+    /* --- SECTIONS --- */
+    section { padding: 100px 0; }
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+    .reveal.active { opacity: 1; transform: translateY(0); }
 
-        .cyber-form { display: flex; flex-direction: column; gap: 40px; }
-        .input-group { position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .input-group label { display: block; font-size: 0.7rem; color: var(--accent); letter-spacing: 3px; margin-bottom: 10px; }
-        .input-group input, .input-group textarea { width: 100%; background: transparent; border: none; color: white; padding: 10px 0; font-family: inherit; font-size: 1.2rem; outline: none; }
-
-        .scan-line { position: absolute; bottom: -1px; left: 0; width: 0%; height: 2px; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: 0.5s ease; }
-        .input-group input:focus ~ .scan-line { width: 100%; }
-
-        .cyber-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 25px; font-weight: bold; letter-spacing: 5px; cursor: pointer; transition: 0.3s; }
-        .cyber-btn:hover { background: var(--accent); color: black; box-shadow: 0 0 30px var(--accent); }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        /* --- RESPONSIVE --- */
-        @media (max-width: 768px) {
-            .section-gallery { height: auto; position: relative; }
-            .gallery-wrapper { flex-direction: column; height: auto; padding: 120px 5%; gap: 50px; transform: none !important; }
-            .gallery-item { width: 100%; height: 45vh; filter: grayscale(0); }
-            #cursor { display: none !important; }
-            .contact-grid { grid-template-columns: 1fr; gap: 60px; }
-            .progress-container { display: none; }
-        }
-    </style>
+  </style>
 </head>
-<body onload="document.querySelector('.reveal').style.transform = 'translateY(-100%)'">
+<body>
 
-    <div class="reveal"></div>
-    <div id="cursor"></div>
-    <div class="grain"></div>
+  <div id="custom-cursor"></div>
+  <div id="canvas-container"></div>
 
-    <nav>
-        <div class="logo">EXUMOIR_STUDIO</div>
-        <div style="font-size: 0.8rem; letter-spacing: 2px;">© 2026</div>
-    </nav>
-
-    <div class="section-gallery">
-        <div class="gallery-wrapper" id="slider">
-            <div class="gallery-item item-1"><div class="item-info"><span>#01</span><h2>CYBER_DREAM</h2></div></div>
-            <div class="gallery-item item-2"><div class="item-info"><span>#02</span><h2>NEON_SOUL</h2></div></div>
-            <div class="gallery-item item-3"><div class="item-info"><span>#03</span><h2>VOID_ARCH</h2></div></div>
-            <div class="gallery-item item-4"><div class="item-info"><span>#04</span><h2>DARK_MATTER</h2></div></div>
-            <div class="gallery-item item-5"><div class="item-info"><span>#05</span><h2>GLITCH_GEN</h2></div></div>
-        </div>
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">VISUAL_LAB</a>
+      <div class="ms-auto">
+        <a href="#projects" class="text-white text-decoration-none fw-bold small tracking-widest">PROJETS_01</a>
+      </div>
     </div>
+  </nav>
 
-    <div class="progress-container"><div class="progress-bar" id="bar"></div></div>
+  <section class="hero">
+    <div class="container text-center">
+      <h1 class="glitch-text">CREATIVE<br>ENGINEER</h1>
+      <p class="mt-4 opacity-50 tracking-widest uppercase">Digital Experience & Code Artistry</p>
+    </div>
+  </section>
 
-    <section class="cyber-contact">
-        <div class="contact-grid">
-            <div class="contact-header">
-                <span class="status-light"></span>
-                <p class="glitch" data-text="ESTABLISH_CONNECTION">ESTABLISH_CONNECTION</p>
-                <h1>PRÊT À<br>INJECTER ?</h1>
-            </div>
-            <form class="cyber-form">
-                <div class="input-group">
-                    <label>ID_UTILISATEUR</label>
-                    <input type="text" placeholder="NOM..." required>
-                    <div class="scan-line"></div>
-                </div>
-                <div class="input-group">
-                    <label>CANAL</label>
-                    <input type="email" placeholder="EMAIL..." required>
-                    <div class="scan-line"></div>
-                </div>
-                <div class="input-group">
-                    <label>TRANSMISSION</label>
-                    <textarea rows="4" placeholder="VOTRE MESSAGE..."></textarea>
-                    <div class="scan-line"></div>
-                </div>
-                <button type="submit" class="cyber-btn">TRANSMETTRE_PAQUET</button>
-            </form>
+  <div class="container">
+    <section id="about" class="reveal">
+      <div class="row g-5 align-items-center">
+        <div class="col-lg-6">
+          <h2 class="display-3 fw-bold mb-4">L'innovation<br><span style="color: var(--accent)">sans limite.</span></h2>
+          <p class="lead opacity-75">Spécialisé dans le développement d'interfaces qui cassent les codes habituels. Je mélange technique pure et esthétique brutale.</p>
         </div>
+        <div class="col-lg-6 text-center">
+           <div class="display-1 text-white-50"><i class="bi bi-layers-half"></i></div>
+        </div>
+      </div>
     </section>
 
-    <script>
-        const cursor = document.getElementById('cursor');
-        const slider = document.getElementById('slider');
-        const bar = document.getElementById('bar');
-        let scrollPos = 0;
+    <section id="projects">
+      <h3 class="mb-5 font-monospace text-uppercase" style="letter-spacing: 10px;">Projets Sélectionnés</h3>
+      <div class="row g-4">
+        <div class="col-md-6 reveal">
+          <div class="project-card">
+            <div class="card-content">
+              <span class="text-accent mb-2 d-block">WebDesign</span>
+              <h4>NEON ARCHIVE</h4>
+              <p class="opacity-50">Exploration de grilles asymétriques et typographies géantes.</p>
+              <a href="#" class="btn-action">Découvrir</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 reveal">
+          <div class="project-card">
+            <div class="card-content">
+              <span class="text-accent mb-2 d-block">3D Dev</span>
+              <h4>QUANTUM VIZ</h4>
+              <p class="opacity-50">Visualisation de données complexes via Three.js et WebGL.</p>
+              <a href="#" class="btn-action">Découvrir</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 
-        // LOUPE DYNAMIQUE
-        document.addEventListener('mousemove', (e) => {
-            const { clientX, clientY } = e;
-            cursor.style.left = clientX + 'px';
-            cursor.style.top = clientY + 'px';
+  <footer class="py-5 text-center border-top border-secondary mt-5">
+    <p class="opacity-25 small">© 2026 LAB — TOUS DROITS RÉSERVÉS</p>
+  </footer>
 
-            const target = document.elementFromPoint(clientX, clientY);
-            const item = target ? target.closest('.gallery-item') : null;
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <script>
+    // 1. CURSEUR CUSTOM
+    const cursor = document.getElementById('custom-cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
 
-            if (item && window.innerWidth > 768) {
-                const rect = item.getBoundingClientRect();
-                const x = ((clientX - rect.left) / rect.width) * 100;
-                const y = ((clientY - rect.top) / rect.height) * 100;
+    // 2. BACKGROUND 3D (Waves)
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-                cursor.style.display = 'block';
-                cursor.style.backgroundImage = window.getComputedStyle(item).backgroundImage;
-                cursor.style.backgroundSize = (rect.width * 2) + 'px';
-                cursor.style.backgroundPosition = `${x}% ${y}%`;
-            } else {
-                cursor.style.display = 'none';
-            }
-        });
+    const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+    const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true });
+    const torus = new THREE.Mesh(geometry, material);
+    scene.add(torus);
+    camera.position.z = 30;
 
-        // SCROLL HYBRIDE (Horizontal puis vertical libéré)
-        window.addEventListener('wheel', (e) => {
-            if (window.innerWidth <= 768) return; // Désactive sur mobile
+    function animate() {
+      requestAnimationFrame(animate);
+      torus.rotation.x += 0.005;
+      torus.rotation.y += 0.005;
+      renderer.render(scene, camera);
+    }
+    animate();
 
-            const maxScroll = slider.scrollWidth - window.innerWidth + (window.innerWidth * 0.1);
+    // 3. REVEAL ANIMATION AU SCROLL
+    const observerOptions = { threshold: 0.1 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
 
-            // Si on est en haut de page, on fait défiler la galerie
-            if (window.scrollY < 10) {
-                if ((scrollPos < maxScroll && e.deltaY > 0) || (scrollPos > 0 && e.deltaY < 0)) {
-                    e.preventDefault();
-                    scrollPos += e.deltaY;
-                    scrollPos = Math.max(0, Math.min(scrollPos, maxScroll));
-                    slider.style.transform = `translateX(${-scrollPos}px)`;
-                    bar.style.width = (scrollPos / maxScroll * 100) + "%";
-                }
-            }
-        }, { passive: false });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // FORMULAIRE MATRIX
-        document.querySelector('.cyber-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = document.querySelector('.cyber-btn');
-            btn.disabled = true;
-            let count = 0;
-            const interval = setInterval(() => {
-                btn.innerHTML = `UPLOADING_${Math.random().toString(16).substring(2, 7)}...`;
-                count++;
-                if (count > 15) {
-                    clearInterval(interval);
-                    btn.innerHTML = "DATA_SYNC_SUCCESS";
-                    btn.style.background = "var(--accent)";
-                    btn.style.color = "black";
-                }
-            }, 60);
-        });
-    </script>
+    // Responsive resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
