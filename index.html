@@ -3,358 +3,425 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio | Ultra Edition</title>
+  <title>CORE.IX | Creative Developer</title>
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
   <style>
     :root {
-      --accent: #00f2ff;
-      --bg: #030303;
-      --card-bg: rgba(255, 255, 255, 0.05);
-      --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      --primary: #00f2ff;
+      --secondary: #bd00ff;
+      --bg-color: #050505;
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.1);
     }
 
     body {
-      background-color: var(--bg);
+      margin: 0;
+      background-color: var(--bg-color);
       color: #fff;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Space Grotesk', sans-serif;
       overflow-x: hidden;
-      cursor: none; /* On cache le curseur pour le custom */
     }
 
-    /* --- CURSEUR PERSONNALISÉ --- */
-    #custom-cursor {
-      width: 20px;
-      height: 20px;
-      background: var(--accent);
-      border-radius: 50%;
+    /* --- CANVAS --- */
+    #webgl {
       position: fixed;
-      pointer-events: none;
-      z-index: 9999;
-      mix-blend-mode: difference;
-      transition: transform 0.1s ease;
-    }
-
-    /* --- BACKGROUND ANIMÉ --- */
-    #canvas-container {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: -1;
-      opacity: 0.4;
+      outline: none;
     }
 
-    /* --- NAV --- */
+    /* --- UI ELEMENTS --- */
     .navbar {
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding: 25px 0;
-    }
-    .navbar-brand {
-      font-family: 'Syncopate', sans-serif;
-      letter-spacing: 5px;
-      color: var(--accent) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.5);
     }
 
-    /* --- HERO --- */
-    .hero {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .glitch-text {
+    .brand-glitch {
       font-family: 'Syncopate', sans-serif;
-      font-size: clamp(3rem, 10vw, 8rem);
-      line-height: 0.9;
-      text-transform: uppercase;
       font-weight: 700;
-      background: linear-gradient(45deg, #fff 30%, var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* --- PROJECT CARDS --- */
-    .project-card {
-      background: var(--card-bg);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 2px;
-      overflow: hidden;
-      transition: var(--transition);
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
       position: relative;
     }
 
-    .project-card:hover {
-      transform: translateY(-15px) scale(1.02);
-      border-color: var(--accent);
-      box-shadow: 0 20px 40px rgba(0, 242, 255, 0.1);
+    .hero-section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      pointer-events: none; /* Laisse passer la souris vers le canvas */
     }
 
-    .card-content {
-      background: var(--bg);
-      border-radius: 18px;
-      padding: 30px;
-      height: 100%;
+    .hero-content {
+      pointer-events: auto; /* Réactive la souris sur le texte */
+      z-index: 10;
+      mix-blend-mode: exclusion;
     }
 
-    .btn-action {
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 10px 25px;
-      border-radius: 10px;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 20px;
-      transition: var(--transition);
+    h1.mega-title {
+      font-family: 'Syncopate', sans-serif;
+      font-size: clamp(3rem, 10vw, 8rem);
+      font-weight: 700;
+      line-height: 0.9;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #fff, #444);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
     }
 
-    .btn-action:hover {
-      background: var(--accent);
-      color: #000;
+    .subtitle {
+      font-size: 1.2rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--primary);
     }
 
-    /* --- SECTIONS --- */
-    section { padding: 100px 0; }
-    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-    .reveal.active { opacity: 1; transform: translateY(0); }
+    /* --- CARDS & SECTIONS --- */
+    section {
+      position: relative;
+      padding: 100px 0;
+      z-index: 2;
+    }
 
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--primary);
+      box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
+    }
+
+    /* --- TERMINAL --- */
+    .terminal {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .terminal-header {
+      background: #1a1a1a;
+      padding: 10px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      gap: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+    
+    .form-control-terminal {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #333;
+      color: var(--primary);
+      border-radius: 0;
+    }
+    .form-control-terminal:focus {
+      background: transparent;
+      box-shadow: none;
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* --- SCROLL INDICATOR --- */
+    .scroll-down {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {transform: translateY(0) translateX(-50%);}
+      40% {transform: translateY(-10px) translateX(-50%);}
+      60% {transform: translateY(-5px) translateX(-50%);}
+    }
   </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body>
 
-  <div id="custom-cursor"></div>
-  <div id="canvas-container"></div>
+  <canvas id="webgl"></canvas>
 
-  <nav class="navbar navbar-expand-lg fixed-top">
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark">
     <div class="container">
-      <a class="navbar-brand" href="#">VISUAL_LAB</a>
-      <div class="ms-auto">
-        <a href="#projects" class="text-white text-decoration-none fw-bold small tracking-widest">PROJETS_01</a>
+      <a class="navbar-brand brand-glitch" href="#">CORE<span style="color:var(--primary)">.IX</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#work">LAB</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">DATA</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact" style="color:var(--primary)">/// CONTACT</a></li>
+        </ul>
       </div>
     </div>
   </nav>
 
-  <section class="hero">
-    <div class="container text-center">
-      <h1 class="glitch-text">CREATIVE<br>ENGINEER</h1>
-      <p class="mt-4 opacity-50 tracking-widest uppercase">Digital Experience & Code Artistry</p>
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="subtitle">Creative Engineer</div>
+      <h1 class="mega-title">BEYOND<br>REALITY</h1>
+      <p class="lead text-white-50 mt-3">Design Immersif & Expériences WebGL</p>
+      <a href="#work" class="btn btn-outline-light rounded-pill px-4 mt-4">Explorer le système</a>
+    </div>
+    <div class="scroll-down text-white opacity-50">
+      <i class="bi bi-mouse"></i> SCROLL
     </div>
   </section>
 
   <div class="container">
-    <section id="about" class="reveal">
-      <div class="row g-5 align-items-center">
-        <div class="col-lg-6">
-          <h2 class="display-3 fw-bold mb-4">L'innovation<br><span style="color: var(--accent)">sans limite.</span></h2>
-          <p class="lead opacity-75">Spécialisé dans le développement d'interfaces qui cassent les codes habituels. Je mélange technique pure et esthétique brutale.</p>
+    
+    <section id="work">
+      <div class="row mb-5">
+        <div class="col-12">
+          <h2 class="display-4 fw-bold text-white"><span style="color:var(--primary)">//</span> SÉLECTION</h2>
         </div>
-        <div class="col-lg-6 text-center">
-           <div class="display-1 text-white-50"><i class="bi bi-layers-half"></i></div>
+      </div>
+      
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="glass-card h-100">
+            <h3 class="fw-bold">NEON VERSE</h3>
+            <p class="text-white-50">Environnement 3D réactif audio.</p>
+            <div class="mt-4 d-flex gap-2">
+              <span class="badge border border-secondary text-secondary">Three.js</span>
+              <span class="badge border border-secondary text-secondary">React</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="glass-card h-100">
+            <h3 class="fw-bold">QUANTUM UI</h3>
+            <p class="text-white-50">Système de design pour la Fintech.</p>
+            <div class="mt-4 d-flex gap-2">
+              <span class="badge border border-secondary text-secondary">WebGL</span>
+              <span class="badge border border-secondary text-secondary">GSAP</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="projects">
-      <h3 class="mb-5 font-monospace text-uppercase" style="letter-spacing: 10px;">Projets Sélectionnés</h3>
-      <div class="row g-4">
-        <div class="col-md-6 reveal">
-          <div class="project-card">
-            <div class="card-content">
-              <span class="text-accent mb-2 d-block">WebDesign</span>
-              <h4>NEON ARCHIVE</h4>
-              <p class="opacity-50">Exploration de grilles asymétriques et typographies géantes.</p>
-              <a href="#" class="btn-action">Découvrir</a>
+    <section id="contact" class="pb-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="terminal p-4">
+            <div class="terminal-header mb-4">
+              <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+              <span class="ms-3 text-white-50 small">root@core-ix:~/contact</span>
             </div>
-          </div>
-        </div>
-        <div class="col-md-6 reveal">
-          <div class="project-card">
-            <div class="card-content">
-              <span class="text-accent mb-2 d-block">3D Dev</span>
-              <h4>QUANTUM VIZ</h4>
-              <p class="opacity-50">Visualisation de données complexes via Three.js et WebGL.</p>
-              <a href="#" class="btn-action">Découvrir</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-<section id="contact" class="reveal">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="terminal-window">
-          <div class="terminal-header">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="terminal-title">STATION_COMMUNICATION_V2.0</span>
-          </div>
-          <div class="terminal-body p-4">
-            <div class="mb-4">
-              <span class="text-accent">> </span><span class="typewriter">INITIALISATION DU PROTOCOLE DE CONTACT...</span>
-            </div>
-            
-            <form action="#">
+            <form>
               <div class="mb-3">
-                <label class="form-label small opacity-50">IDENTIFIANT_NOM</label>
-                <input type="text" class="form-control terminal-input" placeholder="Ex: John Doe" required>
+                <label class="text-secondary small">> IDENTITÉ</label>
+                <input type="text" class="form-control form-control-terminal" placeholder="_">
               </div>
               <div class="mb-3">
-                <label class="form-label small opacity-50">CANAL_EMAIL</label>
-                <input type="email" class="form-control terminal-input" placeholder="nom@provider.com" required>
+                <label class="text-secondary small">> FRÉQUENCE (EMAIL)</label>
+                <input type="email" class="form-control form-control-terminal" placeholder="_">
               </div>
-              <div class="mb-3">
-                <label class="form-label small opacity-50">MESSAGE_DATA</label>
-                <textarea class="form-control terminal-input" rows="4" placeholder="Tapez votre requête ici..."></textarea>
+              <div class="mb-4">
+                <label class="text-secondary small">> MESSAGE DATA</label>
+                <textarea class="form-control form-control-terminal" rows="3" placeholder="_"></textarea>
               </div>
-              <button type="submit" class="btn-terminal w-100 mt-3">
-                EXÉCUTER L'ENVOI <i class="bi bi-terminal ms-2"></i>
+              <button type="submit" class="btn btn-outline-light w-100 py-2" style="border-radius:0;">
+                <i class="bi bi-send me-2"></i> EXÉCUTER L'ENVOI
               </button>
             </form>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+
   </div>
-</section>
 
-<style>
-  /* --- TERMINAL STYLES --- */
-  .terminal-window {
-    background: rgba(10, 10, 10, 0.9);
-    border: 1px solid rgba(0, 242, 255, 0.3);
-    border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-  }
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-  .terminal-header {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px 15px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
+    // CONFIGURATION
+    const canvas = document.querySelector('#webgl');
+    const scene = new THREE.Scene();
+    // Brouillard pour fondre les cubes dans le noir au loin
+    scene.fog = new THREE.FogExp2(0x050505, 0.035); 
 
-  .dot { height: 12px; width: 12px; border-radius: 50%; margin-right: 8px; }
-  .red { background: #ff5f56; }
-  .yellow { background: #ffbd2e; }
-  .green { background: #27c93f; }
+    // CAMERA
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.z = 8;
+    camera.position.y = 2;
 
-  .terminal-title {
-    font-family: 'Syncopate', sans-serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: rgba(255, 255, 255, 0.5);
-    margin-left: 10px;
-  }
+    // RENDERER
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ReinhardToneMapping;
 
-  .terminal-input {
-    background: transparent !important;
-    border: none !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: var(--accent) !important;
-    font-family: 'Courier New', Courier, monospace;
-    padding: 15px 5px;
-    transition: all 0.3s;
-    border-radius: 0;
-  }
+    // POST-PROCESSING (BLOOM EFFECT)
+    const renderScene = new RenderPass(scene, camera);
+    
+    // Paramètres du Glow : (Resolution, Strength, Radius, Threshold)
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+    bloomPass.strength = 1.2; // Intensité du néon
+    bloomPass.radius = 0.5;   // Rayon de diffusion
+    bloomPass.threshold = 0.1; // Seuil de luminosité
 
-  .terminal-input:focus {
-    box-shadow: none;
-    border-bottom: 1px solid var(--accent) !important;
-  }
+    const composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
 
-  .btn-terminal {
-    background: transparent;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    padding: 15px;
-    font-family: 'Syncopate', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 3px;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-terminal:hover {
-    background: var(--accent);
-    color: #000;
-    box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
-  }
-
-  .typewriter {
-    font-family: 'Courier New', monospace;
-    border-right: 2px solid var(--accent);
-    white-space: nowrap;
-    overflow: hidden;
-    animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
-  }
-
-  @keyframes typing { from { width: 0 } to { width: 100% } }
-  @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent) } }
-</style>
-
-  <footer class="py-5 text-center border-top border-secondary mt-5">
-    <p class="opacity-25 small">© 2026 LAB — TOUS DROITS RÉSERVÉS</p>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  
-  <script>
-    // 1. CURSEUR CUSTOM
-    const cursor = document.getElementById('custom-cursor');
-    document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+    // CRÉATION DES CUBES (INSTANCED MESH POUR PERF)
+    const count = 400;
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    
+    // Matériau Wireframe Néon
+    const material = new THREE.MeshBasicMaterial({ 
+      color: 0x00f2ff, 
+      wireframe: true,
+      transparent: true,
+      opacity: 0.5 
     });
 
-    // 2. BACKGROUND 3D (Waves)
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('canvas-container').appendChild(renderer.domElement);
+    // Version solide pour l'intérieur (effet Cyber)
+    const materialSolid = new THREE.MeshBasicMaterial({
+      color: 0x7000ff,
+    });
 
-    const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00f2ff, wireframe: true });
-    const torus = new THREE.Mesh(geometry, material);
-    scene.add(torus);
-    camera.position.z = 30;
+    const mesh = new THREE.InstancedMesh(geometry, material, count);
+    const meshSolid = new THREE.InstancedMesh(geometry, materialSolid, count);
+    scene.add(mesh);
+    // On ajoute un peu de violet solide pour la profondeur
+    scene.add(meshSolid);
+
+    // Positionnement aléatoire des cubes
+    const dummy = new THREE.Object3D();
+    const positions = [];
+    const speeds = [];
+    
+    for(let i = 0; i < count; i++) {
+        // Position aléatoire
+        const x = (Math.random() - 0.5) * 20;
+        const y = (Math.random() - 0.5) * 20;
+        const z = (Math.random() - 0.5) * 20;
+        positions.push({x, y, z, ox: x, oy: y, oz: z}); // ox/oy/oz = origine
+        
+        // Vitesse de rotation aléatoire
+        speeds.push({
+            x: (Math.random() - 0.5) * 0.02,
+            y: (Math.random() - 0.5) * 0.02
+        });
+
+        dummy.position.set(x, y, z);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(i, dummy.matrix);
+        meshSolid.setMatrixAt(i, dummy.matrix);
+    }
+
+    // INTERACTION SOURIS
+    const mouse = new THREE.Vector2();
+    const target = new THREE.Vector2();
+    const windowHalfX = window.innerWidth / 2;
+    const windowHalfY = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', (event) => {
+        mouse.x = (event.clientX - windowHalfX) * 0.01;
+        mouse.y = (event.clientY - windowHalfY) * 0.01;
+    });
+
+    // ANIMATION LOOP
+    const clock = new THREE.Clock();
 
     function animate() {
-      requestAnimationFrame(animate);
-      torus.rotation.x += 0.005;
-      torus.rotation.y += 0.005;
-      renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+
+        const time = clock.getElapsedTime();
+
+        // Lissage du mouvement souris
+        target.x = mouse.x * 0.5;
+        target.y = mouse.y * 0.5;
+
+        // Rotation globale de la scène (douce)
+        mesh.rotation.y += 0.002;
+        meshSolid.rotation.y += 0.002;
+        mesh.rotation.x += (target.y - mesh.rotation.x) * 0.05;
+        mesh.rotation.y += (target.x - mesh.rotation.y) * 0.05;
+
+        // Animation de chaque cube (Onde sinusoïdale + Répulsion)
+        for(let i = 0; i < count; i++) {
+            const { ox, oy, oz } = positions[i];
+            
+            // Effet de flottement
+            const t = time + i; 
+            const floatY = Math.sin(t * 0.5) * 0.5;
+
+            dummy.position.set(
+                ox,
+                oy + floatY,
+                oz
+            );
+
+            // Rotation individuelle
+            dummy.rotation.x += speeds[i].x;
+            dummy.rotation.y += speeds[i].y;
+
+            // Scale effet heartbeat
+            const scale = 1 + Math.sin(t * 2) * 0.1;
+            dummy.scale.set(scale, scale, scale);
+
+            dummy.updateMatrix();
+            mesh.setMatrixAt(i, dummy.matrix);
+            // Les solides sont plus petits pour faire un "cœur"
+            dummy.scale.set(scale * 0.5, scale * 0.5, scale * 0.5);
+            dummy.updateMatrix();
+            meshSolid.setMatrixAt(i, dummy.matrix);
+        }
+
+        mesh.instanceMatrix.needsUpdate = true;
+        meshSolid.instanceMatrix.needsUpdate = true;
+
+        // Utilisation du Composer (avec Bloom) au lieu du renderer classique
+        composer.render();
     }
+
     animate();
 
-    // 3. REVEAL ANIMATION AU SCROLL
-    const observerOptions = { threshold: 0.1 };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        }
-      });
-    }, observerOptions);
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    // Responsive resize
+    // RESIZE
     window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
     });
+
   </script>
 </body>
 </html>
