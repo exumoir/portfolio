@@ -183,6 +183,124 @@
       </div>
     </section>
   </div>
+<section id="contact" class="reveal">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="terminal-title">STATION_COMMUNICATION_V2.0</span>
+          </div>
+          <div class="terminal-body p-4">
+            <div class="mb-4">
+              <span class="text-accent">> </span><span class="typewriter">INITIALISATION DU PROTOCOLE DE CONTACT...</span>
+            </div>
+            
+            <form action="#">
+              <div class="mb-3">
+                <label class="form-label small opacity-50">IDENTIFIANT_NOM</label>
+                <input type="text" class="form-control terminal-input" placeholder="Ex: John Doe" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small opacity-50">CANAL_EMAIL</label>
+                <input type="email" class="form-control terminal-input" placeholder="nom@provider.com" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label small opacity-50">MESSAGE_DATA</label>
+                <textarea class="form-control terminal-input" rows="4" placeholder="Tapez votre requête ici..."></textarea>
+              </div>
+              <button type="submit" class="btn-terminal w-100 mt-3">
+                EXÉCUTER L'ENVOI <i class="bi bi-terminal ms-2"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* --- TERMINAL STYLES --- */
+  .terminal-window {
+    background: rgba(10, 10, 10, 0.9);
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+  }
+
+  .terminal-header {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dot { height: 12px; width: 12px; border-radius: 50%; margin-right: 8px; }
+  .red { background: #ff5f56; }
+  .yellow { background: #ffbd2e; }
+  .green { background: #27c93f; }
+
+  .terminal-title {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 10px;
+  }
+
+  .terminal-input {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--accent) !important;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 15px 5px;
+    transition: all 0.3s;
+    border-radius: 0;
+  }
+
+  .terminal-input:focus {
+    box-shadow: none;
+    border-bottom: 1px solid var(--accent) !important;
+  }
+
+  .btn-terminal {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 15px;
+    font-family: 'Syncopate', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 3px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-terminal:hover {
+    background: var(--accent);
+    color: #000;
+    box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+  }
+
+  .typewriter {
+    font-family: 'Courier New', monospace;
+    border-right: 2px solid var(--accent);
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+  }
+
+  @keyframes typing { from { width: 0 } to { width: 100% } }
+  @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent) } }
+</style>
 
   <footer class="py-5 text-center border-top border-secondary mt-5">
     <p class="opacity-25 small">© 2026 LAB — TOUS DROITS RÉSERVÉS</p>
